@@ -461,7 +461,7 @@ export default {
     // 获取数据
     getData() {
       var res = this;
-      localStorage.getItem("bcId");
+      localStorage.getItem("id");
       this.$axios({
         url:
           "http://yun.jinshipark.com:81/JinshiCouponGenerate/selectCouponAll?bcId=" +

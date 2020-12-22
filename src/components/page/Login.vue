@@ -3,8 +3,8 @@
         <div class="ms-login">
             <div class="ms-title">金石停车 商户平台</div>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="ms-content">
-                <el-form-item prop="username">
-                    <el-input v-model="ruleForm.username" placeholder="username" @blur="bur">
+                <el-form-item prop="loginName">
+                    <el-input v-model="ruleForm.loginName" placeholder="loginName" @blur="bur">
                         <!-- <el-button slot="prepend" icon="el-icon-lx-people"></el-button> -->
                     </el-input>
                 </el-form-item>
@@ -33,6 +33,8 @@
     </div>
 </template>
 <script>
+    import md5 from 'js-md5';
+
     export default {
         data: function () {
             return {
@@ -40,11 +42,11 @@
                 checkeders: '',
                 applyGood: [],
                 ruleForm: {
-                    username: '',
+                    loginName: '',
                     password: ''
                 },
                 rules: {
-                    username: [{
+                    loginName: [{
                         required: true,
                         message: '请输入用户名',
                         trigger: 'blur'
@@ -69,70 +71,83 @@
             } else {
                 this.checked = false
             }
-
-            console.log(this.checked)
-            this.ruleForm.username = window.localStorage.getItem("checkedersid")
-            if (this.ruleForm.username != null) {
+            this.ruleForm.loginName = window.localStorage.getItem("checkedersid")
+            if (this.ruleForm.loginName != null) {
                 this.bur()
             }
         },
         methods: {
             bur() {
-                var nde = JSON.parse(window.localStorage.getItem('applyParams'))
+                var flag = false;
+                var nde = JSON.parse(window.localStorage.getItem('applyParams'));
+                console.log(nde);
+                if (nde == null) {
+                    return;
+                }
                 for (var i = 0; i < nde.length; i++) {
-                    if (this.ruleForm.username == nde[i].username) {
-                        this.ruleForm.password = nde[i].password
-                    } else {
-                        this.ruleForm.password = ""
+                    if (this.ruleForm.loginName == nde[i].loginName) {
+                        this.ruleForm.password = nde[i].password;
+                        this.checked = true;
+                        this.checkeders = true;
+                        flag = true;
                     }
+                }
+                if (!flag) {
+                    this.ruleForm.password = '';
                 }
 
             },
             userMessage(formName) {
                 var res = this
                 this.$axios({
-                    url: this.GLOBAL._SERVER_API_ + 'login?bcUsername=' + res.ruleForm.username + '&bcPassword=' + res.ruleForm.password,
+                    url: this.GLOBAL._SERVER_API_ + 'user/login?loginName=' + res.ruleForm.loginName + '&password=' + md5(res.ruleForm.password),
                     method: 'get'
-                    // data: {
-                    // 	'bcUsername': res.ruleForm.username,
-                    // 	'bcPassword': res.ruleForm.password
-                    // }
                 }).then(function (response) {
-                    if (response.status <= 200) {
-                        console.log(res)
-                        if (response.data.code == 1) {
-                            localStorage.setItem('ms_username', res.ruleForm.username);
-                            // document.cookie = "jurisdiction=" +JSON.stringify(response.data.info)
-                            localStorage.setItem('bcId', response.data.bcId);
-                            localStorage.setItem('agentId', response.data.agentId);
-                            localStorage.setItem('areaId', response.data.areaId);
-                            localStorage.setItem('parkingId', response.data.parkingId);
-                            // console.log(response.data)
-                            res.$router.push('/couponMessage');
-                            localStorage.setItem("numberword", res.ruleForm.password)
-                            if (res.checked == true) {
-                                localStorage.setItem('cd', true);
+                    if (response.data.status == 200) {
+                        console.log(response)
+                        localStorage.setItem('ms_loginName', res.ruleForm.loginName);
+                        console.log(response.data.data.id);
+                        localStorage.setItem('userId', response.data.data.id);
+                        localStorage.setItem('agentId', response.data.data.agentid);
+                        localStorage.setItem('areaId', response.data.data.areaid);
+                        localStorage.setItem('parkingId', response.data.data.parkid);
+                        console.log(res.ruleForm.password)
+                        localStorage.setItem("password", res.ruleForm.password)
+                        if (res.checked == true) {
+                            var flag = false;
+                            localStorage.setItem('cd', true);
+                            if (window.localStorage.getItem('applyParams')) {
+
+                                res.applyGood = JSON.parse(window.localStorage.getItem('applyParams'));
+                                for (var i = 0; i < res.applyGood.length; i++) {
+                                    if (res.ruleForm.loginName === res.applyGood[i].loginName) {
+                                        flag = true;
+                                    }
+                                }
+
+                            }
+                            if(!flag){
                                 res.applyGood.push({
-                                    username: res.ruleForm.username,
+                                    loginName: res.ruleForm.loginName,
                                     password: res.ruleForm.password,
                                 })
-                                localStorage.setItem('applyParams', JSON.stringify(res.applyGood))
-                            } else {
-                                localStorage.removeItem("cd");
-                                //没有填写记住密码
                             }
-                            if (res.checkeders == true) {
-                                localStorage.setItem('dd', true);
-                                localStorage.setItem('checkedersid', res.ruleForm.username)
-                            } else {
-                                //没有记住用户名
-                                localStorage.removeItem("dd");
-                            }
-                        } else if (response.data.code == 0) {
-                            alert("用户不存在")
+
+                            localStorage.setItem('applyParams', JSON.stringify(res.applyGood))
                         } else {
-                            alert("密码错误")
+                            localStorage.removeItem("cd");
+                            //没有填写记住密码
                         }
+                        if (res.checkeders == true) {
+                            localStorage.setItem('dd', true);
+                            localStorage.setItem('checkedersid', res.ruleForm.loginName)
+                        } else {
+                            //没有记住用户名
+                            localStorage.removeItem("dd");
+                        }
+                        res.$router.push('/couponMessage');
+                    } else {
+                        alert(response.data.msg)
                     }
                 }).catch(function (error) {
                     res.$message.error('系统错误: ' + error);
