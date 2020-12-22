@@ -109,6 +109,7 @@
                         console.log(response.data.data.id);
                         localStorage.setItem('userId', response.data.data.id);
                         localStorage.setItem('agentId', response.data.data.agentid);
+                        localStorage.setItem('shopid', response.data.data.shopid);
                         localStorage.setItem('areaId', response.data.data.areaid);
                         localStorage.setItem('parkingId', response.data.data.parkid);
                         console.log(res.ruleForm.password)
