@@ -22,23 +22,23 @@
             >
                 <el-table-column type="selection" width="50" align="center" class-name="table"></el-table-column>
                 <el-table-column type="index" width="50" align="center" label="序号" class-name="table"></el-table-column>
-                <el-table-column prop="couponId" v-if="false"></el-table-column>
+                <el-table-column prop="couponid" v-if="false"></el-table-column>
                 <el-table-column prop="names" label="优惠券类型" class-name="table"></el-table-column>
-                <el-table-column prop="couponName" label="减免券名称" class-name="table"></el-table-column>
+                <el-table-column prop="name" label="减免券名称" class-name="table"></el-table-column>
 
-                <el-table-column prop="couponStarttime" label="开始时间" class-name="table"></el-table-column>
-                <el-table-column prop="couponEndtime" label="结束时间" class-name="table"></el-table-column>
+                <el-table-column prop="startdate" label="开始时间" class-name="table"></el-table-column>
+                <el-table-column prop="enddate" label="结束时间" class-name="table"></el-table-column>
 
                 <!--
                 <el-table-column prop="jcgType" label="类型" class-name="table"></el-table-column>-->
 
-                <el-table-column prop="couponCount" label="减免券总数量" class-name="table"></el-table-column>
-                <el-table-column prop="couponDataA" label="减免券剩余量" class-name="table"></el-table-column>
+                <el-table-column prop="count" label="减免券总数量" class-name="table"></el-table-column>
+                <el-table-column prop="remaincount" label="减免券剩余量" class-name="table"></el-table-column>
 
-                <el-table-column prop="jcgReliefAlltime" label="减免总时长" class-name="table"></el-table-column>
-                <el-table-column prop="jcgReliefRemaintime" label="减免剩余时长" class-name="table"></el-table-column>
-                <el-table-column prop="jcgReliefAllmoney" label="减免总金额" class-name="table"></el-table-column>
-                <el-table-column prop="jcgReliefRemainmoney" label="减免剩余金额" class-name="table"></el-table-column>
+                <el-table-column prop="reductiontime" label="减免总时长" class-name="table"></el-table-column>
+<!--                <el-table-column prop="jcgReliefRemaintime" label="减免剩余时长" class-name="table"></el-table-column>-->
+                <el-table-column prop="reductionmoney" label="减免总金额" class-name="table"></el-table-column>
+<!--                <el-table-column prop="jcgReliefRemainmoney" label="减免剩余金额" class-name="table"></el-table-column>-->
 
                 <!--
                 <el-table-column prop="jcgStartdata" label="开始日期" :formatter="dateFormatterexpirationTime" class-name="table"></el-table-column>
@@ -47,8 +47,8 @@
                 <el-table-column prop="jcgEndtime" label="结束时间" :formatter="dateFormatterexpirationTime" class-name="table"></el-table-column>
                 <el-table-column prop="jcgAreaName" label="代理商" class-name="table"></el-table-column>
                 -->
-                <el-table-column prop="couponParkingName" label="停车场" class-name="table"></el-table-column>
-                <el-table-column prop="couponAreaName" label="区域" class-name="table"></el-table-column>
+<!--                <el-table-column prop="couponParkingName" label="停车场" class-name="table"></el-table-column>-->
+<!--                <el-table-column prop="couponAreaName" label="区域" class-name="table"></el-table-column>-->
                 <el-table-column label="操作" width="180" align="center" class-name="table">
                     <template slot-scope="scope">
                         <el-button
@@ -389,7 +389,7 @@
             };
         },
         created() {
-            // this.getData();
+            this.getData();
             // this.getAgent();
             // this.getArea();
             // this.getParking();
@@ -473,24 +473,22 @@
                     // data: { pageNum: res.cur_page, pageSize: res.pagesize }
                 })
                     .then(function (response) {
-                        if (response.status <= 200) {
-                            res.tableData = response.data;
-                            console.log(response.data);
-
-
+                        if (response.data.status === 200) {
+                            res.tableData = response.data.data;
+                            console.log(response.data.data);
                             for (let i = 0; i < res.tableData.length; i++) {
                                 res.tableData[i]["names"] = ""
                             }
                             for (let i = 0; i < res.tableData.length; i++) {
 
 
-                                if (res.tableData[i].couponType == 0) {
+                                if (res.tableData[i].type == 0) {
                                     res.tableData[i].names = "全免劵"
-                                } else if (res.tableData[i].couponType == 1) {
+                                } else if (res.tableData[i].type == 1) {
                                     res.tableData[i].names = "减免时长"
-                                } else if (res.tableData[i].couponType == 2) {
+                                } else if (res.tableData[i].type == 2) {
                                     res.tableData[i].names = "减免金额"
-                                } else if (res.tableData[i].couponType == 3) {
+                                } else if (res.tableData[i].type == 3) {
                                     res.tableData[i].names = "当天有效全免劵"
                                 }
                             }
