@@ -7,12 +7,7 @@
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
-
         <div class="container">
-            <!-- <div class="handle-box">
-              <el-button type="primary" icon="el-icon-delete" class="handle-del mr10" @click="delAll">批量删除</el-button>
-              <el-button type="primary" icon="el-icon-search" @click="addVisible = true">添加</el-button>
-            </div> -->
             <el-table
                     :data="tableData"
                     border
@@ -22,33 +17,13 @@
             >
                 <el-table-column type="selection" width="50" align="center" class-name="table"></el-table-column>
                 <el-table-column type="index" width="50" align="center" label="序号" class-name="table"></el-table-column>
-                <el-table-column prop="couponid" v-if="false"></el-table-column>
+                <el-table-column prop="id" v-if="false"></el-table-column>
                 <el-table-column prop="names" label="优惠券类型" class-name="table"></el-table-column>
-                <el-table-column prop="name" label="减免券名称" class-name="table"></el-table-column>
-
-                <el-table-column prop="startdate" label="开始时间" class-name="table"></el-table-column>
-                <el-table-column prop="enddate" label="结束时间" class-name="table"></el-table-column>
-
-                <!--
-                <el-table-column prop="jcgType" label="类型" class-name="table"></el-table-column>-->
-
+                <el-table-column prop="couponname" label="减免券名称" class-name="table"></el-table-column>
+                <el-table-column prop="starttime" label="开始时间" class-name="table"></el-table-column>
+                <el-table-column prop="endtime" label="结束时间" class-name="table"></el-table-column>
                 <el-table-column prop="count" label="减免券总数量" class-name="table"></el-table-column>
                 <el-table-column prop="remaincount" label="减免券剩余量" class-name="table"></el-table-column>
-
-                <el-table-column prop="reductiontime" label="减免总时长" class-name="table"></el-table-column>
-<!--                <el-table-column prop="jcgReliefRemaintime" label="减免剩余时长" class-name="table"></el-table-column>-->
-                <el-table-column prop="reductionmoney" label="减免总金额" class-name="table"></el-table-column>
-<!--                <el-table-column prop="jcgReliefRemainmoney" label="减免剩余金额" class-name="table"></el-table-column>-->
-
-                <!--
-                <el-table-column prop="jcgStartdata" label="开始日期" :formatter="dateFormatterexpirationTime" class-name="table"></el-table-column>
-                <el-table-column prop="jcgEnddata" label="结束日期" :formatter="dateFormatterexpirationTime" class-name="table"></el-table-column>
-                <el-table-column prop="jcgStarttime" label="开始时间" :formatter="dateFormatterexpirationTime" class-name="table"></el-table-column>
-                <el-table-column prop="jcgEndtime" label="结束时间" :formatter="dateFormatterexpirationTime" class-name="table"></el-table-column>
-                <el-table-column prop="jcgAreaName" label="代理商" class-name="table"></el-table-column>
-                -->
-<!--                <el-table-column prop="couponParkingName" label="停车场" class-name="table"></el-table-column>-->
-<!--                <el-table-column prop="couponAreaName" label="区域" class-name="table"></el-table-column>-->
                 <el-table-column label="操作" width="180" align="center" class-name="table">
                     <template slot-scope="scope">
                         <el-button
@@ -57,157 +32,40 @@
                                 @click="handleEdit(scope.$index, scope.row)"
                         >生成
                         </el-button>
-                        <!-- <el-button
-                          type="text"
-                          icon="el-icon-delete"
-                          class="red"
-                          @click="handleDelete(scope.$index, scope.row)"
-                        >查看</el-button>-->
                     </template>
                 </el-table-column>
             </el-table>
-            <!--
-            <div class="pagination">
-              <el-pagination
-                background
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page="cur_page"
-                :page-size="pagesize"
-                :total="totalRecords"
-                :page-sizes="[5, 10, 20, 40]"
-                layout="total, sizes, prev, pager, next, jumper"
-              ></el-pagination>
-            </div>-->
+
         </div>
-        <!-- 添加弹出框 -->
-        <el-dialog title="添加" :visible.sync="addVisible" width="30%">
-            <el-form ref="addForm" :model="addForm" label-width="100px">
-                <el-form-item label="优惠券名称" prop="jcgName ">
-                    <el-input v-model="addForm.jcgName "></el-input>
-                </el-form-item>
-                <el-form-item label="类型" prop="jcgType">
-                    <el-input v-model="addForm.jcgType"></el-input>
-                </el-form-item>
-                <el-form-item label="数量" prop="jcgCount">
-                    <el-input v-model="addForm.jcgCount"></el-input>
-                </el-form-item>
-                <el-form-item label="开始日期" prop="jcgStartdata">
-                    <el-date-picker v-model="addForm.jcgStartdata" type="date" placeholder="选择日期"></el-date-picker>
-                </el-form-item>
-                <el-form-item label="结束日期" prop="jcgEnddata">
-                    <el-date-picker v-model="addForm.jcgEnddata" type="date" placeholder="选择日期"></el-date-picker>
-                </el-form-item>
-                <el-form-item label="开始时间" prop="jcgStarttime">
-                    <el-time-picker
-                            v-model="addForm.jcgStarttime"
-                            :picker-options="{
-           selectableRange: '18:30:00 - 20:30:00'
-            }"
-                            placeholder="任意时间点"
-                    ></el-time-picker>
-                </el-form-item>
-                <el-form-item label="结束时间" prop="jcgEndtime">
-                    <el-time-picker
-                            v-model="addForm.jcgEndtime"
-                            :picker-options="{
-      selectableRange: '00:00:00 - 23:59:59'
-    }"
-                            placeholder="任意时间点"
-                    ></el-time-picker>
-                </el-form-item>
-                <el-form-item label="代理商" prop="jcgAgentName">
-                    <el-select v-model="addForm.jcgAgentName" placeholder="代理商">
-                        <el-option
-                                v-for="item in agent"
-                                :key="item.jcgAgentName"
-                                :label="item.jcgAgentName"
-                                :value="item.jcgAgentName"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="停车场" prop="jcgParkingName">
-                    <el-select v-model="addForm.jcgParkingName" placeholder="停车场">
-                        <el-option
-                                v-for="item in parking"
-                                :key="item.jcgParkingName"
-                                :label="item.jcgParkingName"
-                                :value="item.jcgParkingName"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="区域" prop="jcgAreaName">
-                    <el-select v-model="addForm.jcgAreaName" placeholder="区域">
-                        <el-option
-                                v-for="item in area"
-                                :key="item.jcgAreaName"
-                                :label="item.jcgAreaName"
-                                :value="item.jcgAreaName"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="商户" prop="jcgBcName">
-                    <el-select v-model="addForm.jcgBcName" placeholder="商户">
-                        <el-option
-                                v-for="item in bc"
-                                :key="item.jcgBcName"
-                                :label="item.jcgBcName"
-                                :value="item.jcgBcName"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="优惠券" prop="jcgBcName">
-                    <el-select v-model="addForm.jcgCouponName" placeholder="优惠券">
-                        <el-option
-                                v-for="item in bc"
-                                :key="item.jcgCouponName"
-                                :label="item.jcgCouponName"
-                                :value="item.jcgCouponName"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-        <el-button @click="addVisible = false">取 消</el-button>
-        <el-button type="primary" @click="saveAdd">确 定</el-button>
-      </span>
-        </el-dialog>
-        <!-- 修改弹出框 -->
+        <!-- 生成弹出框 -->
         <el-dialog title="生成优惠券" :visible.sync="editVisibleCoupon" width="30%">
-            <el-form :model="editForm" :rules="editFormRules" ref="editForm" label-width="100px">
-                <el-form-item label="优惠券名称" prop="jcgName">
-                    <el-input v-model="editForm.jcgName" placeholder="请输入优惠券名称,此项由用户自定义，以便在优惠券生成模块区分。"></el-input>
+            <el-form :model="addForm" :rules="addFormRules" ref="addForm" label-width="100px">
+                <el-form-item label="优惠券名称" prop="couponname">
+                    <el-input v-model="addForm.couponname" placeholder="请输入优惠券名称,此项由用户自定义，以便在优惠券生成模块区分。"></el-input>
                 </el-form-item>
                 <!--
                 <el-form-item label="类型" prop="jcgType">
                   <el-input v-model="editForm.jcgType"></el-input>
                 </el-form-item>-->
-                <el-form-item label="优惠券数量" prop="jcgCount">
-                    <el-input v-model="editForm.jcgCount" placeholder="请输入需要生成的优惠券数量，数量需要小于已有的优惠券数量"></el-input>
+                <el-form-item label="优惠券数量" prop="count">
+                    <el-input v-model="addForm.count" placeholder="请输入需要生成的优惠券数量，数量需要小于已有的优惠券数量"></el-input>
                 </el-form-item>
                 <span class="span_addserver" v-if="addserver!=''">{{addserver}}</span>
-                <el-form-item label="优惠券类型" prop="jcgType">
-                    <el-select v-model="editForm.jcgType" @change="chooseCoupon" :disabled="flagNum">
-                        <el-option
-                                v-for="item in couponType"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-
-                        ></el-option>
+                <el-form-item label="优惠券类型" prop="coupontype">
+                    <el-select v-model="addForm.coupontype" @change="chooseCoupon" :disabled="flagNum">
+                        <el-option v-for="item in couponType" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
                 </el-form-item>
-
                 <el-form-item label="减免时长" prop="time">
-                    <el-input v-model="editForm.jcgReliefTime" placeholder="减免时长（小时）" :disabled="flagTime"></el-input>
+                    <el-input v-model="addForm.jcgReliefTime" placeholder="减免时长（小时）" :disabled="flagTime"></el-input>
                 </el-form-item>
                 <el-form-item label="减免金额" prop="money">
-                    <el-input v-model="editForm.jcgReliefMoney" placeholder="减免金额（元）" :disabled="flagMoney"></el-input>
+                    <el-input v-model="addForm.jcgReliefMoney" placeholder="减免金额（元）" :disabled="flagMoney"></el-input>
                 </el-form-item>
 
                 <el-form-item label="开始日期" prop="jcgStartdata">
                     <el-date-picker
-                            v-model="editForm.jcgStartdata"
+                            v-model="addForm.jcgStartdata"
                             type="datetime"
                             :picker-options="{
               selectableRange: '00:00:00 - 00:00:00'
@@ -217,7 +75,7 @@
                 </el-form-item>
                 <el-form-item label="结束日期" prop="jcgEnddata">
                     <el-date-picker
-                            v-model="editForm.jcgEnddata"
+                            v-model="addForm.jcgEnddata"
                             type="datetime"
                             :picker-options="{
               selectableRange: '23:59:59 - 23:59:59'
@@ -245,9 +103,7 @@
 </template>
 
 <script>
-    // import { fetchData } from '../../api/index';
     import Validator from "async-validator";
-
     export default {
         name: "carManager",
         data() {
@@ -258,10 +114,6 @@
 
                 var date2 = new Date(this.editForm.jcgEnddata);
                 var time2 = date2.getTime();
-
-                console.log(time1);
-                console.log(time2);
-
                 if (time1 > time2) {
                     callback(new Error("结束时间不能早与开始时间"));
                     console.log("12");
@@ -270,8 +122,6 @@
                     console.log("13");
                 }
             };
-
-
             return {
                 coupon: [],
                 bc: [],
@@ -292,17 +142,15 @@
                 editVisibleCoupon: false,
                 addVisible: false,
                 delVisible: false,
-                residuenumber: "",
-                nameS: "",
+                names: "",
                 rowtime: "",
                 money: "",
-                NumberS: "",
+                remaincount: "",
                 Alltime: "",
                 AllMoney: "",
                 addForm: {
-                    jcgId: "",
-                    jcgName: "",
-                    jcgCount: "",
+                    couponname: "",
+                    count: "",
                     jcgStartdata: "",
                     jcgEnddata: "",
                     jcgStarttime: "",
@@ -314,50 +162,20 @@
                     jcgCouponName: "",
                     couponId: ""
                 },
-                editForm: {
-                    jcgId: "",
-                    jcgName: "",
-                    jcgCount: "",
-                    jcgStartdata: "",
-                    jcgEnddata: "",
-                    jcgStarttime: "",
-                    jcgEndtime: "",
-                    jcgBcName: "",
-                    jcgAgentName: "",
-                    jcgParkingName: "",
-                    jcgAreaName: "",
-                    jcgCouponName: "",
-                    jcgType: "",
-                    jcgReliefTime: "", // 减免时长
-                    jcgReliefMoney: "",// 减免金额
-                    jcgReliefAllmoney: "",//减免总金额
-                    jcgReliefAlltime: "",//减免总时长
-                    couponId: "",
-                    bcId: ""
-                },
-                editFormRules: {
-                    jcgName: [
+                addFormRules: {
+                    couponname: [
                         {required: true, message: "请输入优惠券名称", trigger: "blur"},
                         {min: 1, max: 20, message: "名称应在20字节以内", trigger: "blur"}
                     ],
-                    jcgCount: [
+                    count: [
                         {required: true, message: "请输入优惠券数量", trigger: "blur"},
                         {pattern: /^[0-9]+$/, message: "请输入正确的数量"},
 
                     ],
-                    // jcgEnddata:[
-                    //   { required: true, message: "请输入结束时间", trigger: "blur" },
-                    //   { Validator:addjcgEnddata,trigger:"blur"}
-                    // ]
                     jcgEnddata: [
                         {required: true, message: "请输入结束时间", trigger: "blur"},
                         {validator: addjcgEnddata, trigger: "blur"}
                     ]
-                    // jcgCount:[{}];
-                    // jcgStartdata:[{}];
-                    // jcgEnddata:[{}];
-                    // jcgStarttime:[{}];
-                    // jcgEndtime:[{}];
                 },
                 options: [],
                 value: "",
@@ -482,13 +300,13 @@
                             for (let i = 0; i < res.tableData.length; i++) {
 
 
-                                if (res.tableData[i].type == 0) {
+                                if (res.tableData[i].coupontype == 0) {
                                     res.tableData[i].names = "全免劵"
-                                } else if (res.tableData[i].type == 1) {
+                                } else if (res.tableData[i].coupontype == 1) {
                                     res.tableData[i].names = "减免时长"
-                                } else if (res.tableData[i].type == 2) {
+                                } else if (res.tableData[i].coupontype == 2) {
                                     res.tableData[i].names = "减免金额"
-                                } else if (res.tableData[i].type == 3) {
+                                } else if (res.tableData[i].coupontype == 3) {
                                     res.tableData[i].names = "当天有效全免劵"
                                 }
                             }
@@ -611,42 +429,31 @@
             },
             //修改
             handleEdit(index, row) {
-                console.log(row)
                 this.rowtime = row
-                this.nameS = row.names
-                this.NumberS = row.couponDataA
-                this.Alltime = row.jcgReliefRemaintime
-                this.AllMoney = row.jcgReliefRemainmoney
-                if (row.couponType == "1") {
+                this.names = row.names;//优惠券类型名称
+                this.remaincount = row.remaincount;//剩余优惠券数量
+                if (row.coupontype === "1") {
                     this.flagTime = false;
                     this.flagTime = false;
                     this.flagMoney = true;
-                    // this.flagNum = true;
-                } else if (row.couponType == "2") {
+                } else if (row.coupontype === "2") {
                     this.flagTime = true;
                     this.flagMoney = false;
-                    // this.flagNum = true;
-                } else if (row.couponType == "3") {
+                } else if (row.coupontype === "3") {
                     this.flagTime = true;
                     this.flagMoney = true;
-                    // this.flagNum = false;
-                } else if (row.couponType == "0") {
+                } else if (row.coupontype === "0") {
                     this.flagTime = true;
                     this.flagMoney = true;
-                    // this.flagNum = false;
                 }
-                console.log(this.editForm)
-
-                this.residuenumber = row.couponDataA; //剩余数量
                 this.idx = index;
-                this.id = row.couponId;
-                console.log(this.residuenumber);
+                this.id = row.id;
                 this.editVisibleCoupon = true;
-                this.editForm = {
-                    jcgName: "",
-                    jcgType: "",
-                    jcgCount: row.jcgCount,
-                    couponId: row.couponId,
+                this.addForm = {
+                    couponname: "",
+                    coupontype: Number(row.coupontype),
+                    count: row.count,
+                    couponId: row.id,
                     jcgBcName: row.couponBcName,
                     jcgAgentName: row.couponAgentName,
                     jcgParkingName: row.couponParkingName,
@@ -674,13 +481,13 @@
 
             chooseCoupon(value) {
                 console.log(value)
-                this.editForm.jcgType = value
-                if (this.editForm.jcgType == "减免时长") {
+                this.addForm.jcgType = value
+                if (this.addForm.jcgType == "减免时长") {
 
                     this.flagTime = false;
                     this.flagMoney = true;
                     // this.editForm.jcgReliefMoney = ""
-                } else if (this.editForm.jcgType == "减免金额") {
+                } else if (this.addForm.jcgType == "减免金额") {
                     this.flagMoney = false;
                     this.flagTime = true;
                     // this.editForm.jcgReliefTime = ""
