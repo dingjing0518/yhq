@@ -24,6 +24,11 @@ export default new Router({
                     component: resolve => require(['../components/page/couponOrder.vue'], resolve),
                     meta: { title: '优惠券订单' }
                 },
+                {
+                    path: '/couponOrderHistory',
+                    component: resolve => require(['../components/page/couponOrderHistory.vue'], resolve),
+                    meta: { title: '优惠券订单历史' }
+                },
                 //优惠券生成
                 {
                     path: '/couponCheck',

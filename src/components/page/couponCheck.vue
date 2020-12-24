@@ -42,8 +42,8 @@
         <!-- 充值弹出框 -->
         <el-dialog title="充值" :visible.sync="addnewVisible" width="30%">
             <el-form ref="addnewForm" :model="addnewForm" :rules="carFormRules" label-width="100px">
-                <el-form-item :label="typenames" prop="jcgCount">
-                    <el-input v-model="addnewForm.jcgCount" :placeholder="point" @blur="blur"></el-input>
+                <el-form-item :label="typenames" prop="count">
+                    <el-input v-model="addnewForm.count" :placeholder="point" @blur="blur"></el-input>
 
                     <p class="point-p">{{pointNames}}</p>
                 </el-form-item>
@@ -125,7 +125,7 @@
                 select_cate: "",
                 select_word: "",
                 del_list: [],
-                couponCount: "",
+                remaincount: "",
                 options: [],
                 value: "",
                 codePark: "",
@@ -142,8 +142,8 @@
                 id: "",
                 revertId: "",
                 addnewForm: {
-                    jcgId: "",
-                    jcgCount: ""
+                    id: "",
+                    count: ""
                 }
             };
         },
@@ -291,6 +291,7 @@
                     });
                 }
             },
+            //下载图片
             downs() {
                 // //找到canvas标签
                 let myCanvas = document
@@ -351,6 +352,7 @@
 
             //续费
             handleadd(index, row) {
+                console.log(row);
                 this.posinType = row;
                 this.idx = index;
                 this.id = row.id;
@@ -370,149 +372,134 @@
                 }
                 //todo
                 var date = new Date();
-                var date2 = new Date(row.jcgEnddata);
-                console.log(row.jcgEnddata);
+                var date2 = new Date(row.enddate);
                 var time1 = date.getTime();
                 var time2 = date2.getTime();
-                console.log(time1, time2);
                 if (time1 > time2) {
                     this.$message.error("优惠券已过期");
                 } else {
-                    var idd = row.jcgId;
-                    var jcgType = Number(row.jcgType);
+                    var id = row.id;
+                    var type = Number(row.type);
 
                     this.addnewForm = {
-                        jcgType: jcgType,
-                        jcgId: idd,
+                        type: type,
+                        id: id,
                         count: "",
-                        jcgReliefAlltime: "",
-                        jcgReliefAllmoney: "",
-                        jcgCount: ""
+                        reductiontime: "",
+                        reductionmoney: "",
+                        // jcgCount: ""
                     };
                     // this.addnewForm.jcgId = idd;
                     this.addnewVisible = true;
-                    // this.couponCount = row.couponCount;
+                    this.remaincount = row.remaincount;
                 }
             },
 
             addSure() {
                 console.log(this.posinType);
-                if (this.posinType.jcgType == 1) {
-                    this.addnewForm.jcgReliefAlltime =
-                        Number(this.addnewForm.jcgCount) *
-                        Number(this.posinType.jcgReliefTime);
-                    this.addnewForm.count = Number(this.addnewForm.jcgCount);
-                    this.addnewForm.jcgReliefAllmoney = "";
-                    console.log(this.addnewForm.jcgReliefAlltime, "22222222222222222222");
-                } else if (this.posinType.jcgType == 2) {
-                    this.addnewForm.jcgReliefAllmoney =
-                        Number(this.addnewForm.jcgCount) *
-                        Number(this.posinType.jcgReliefMoney);
-                    this.addnewForm.jcgReliefAlltime = "";
-                    this.addnewForm.count = Number(this.addnewForm.jcgCount);
+                if (this.posinType.type == 1) {
+                    //todo
+                } else if (this.posinType.type == 2) {
+                    //todo
                 } else {
-                    this.addnewForm.count = Number(this.addnewForm.jcgCount);
-                    this.addnewForm.jcgReliefAllmoney = "";
-                    this.addnewForm.jcgReliefAlltime = "";
+                    this.addnewForm.count = Number(this.addnewForm.count);
+                    this.addnewForm.reductiontime = "";
+                    this.addnewForm.reductionmoney = "";
                 }
-                this.addnewForm.jcgCount = Number(this.posinType.jcgCount);
-                this.addnewForm.jcgReliefAllmoney = String(
-                    this.addnewForm.jcgReliefAllmoney
+                this.addnewForm.count = Number(this.addnewForm.count);
+                this.addnewForm.reductionmoney = String(
+                    this.addnewForm.reductionmoney
                 );
-                this.addnewForm.jcgReliefAlltime = String(
-                    this.addnewForm.jcgReliefAlltime
+                this.addnewForm.reductiontime = String(
+                    this.addnewForm.reductiontime
                 );
-                console.log(this.addnewForm.jcgReliefAlltime);
                 var res = this;
                 var setData = this.addnewForm;
-                console.log(setData);
-
-                if (res.addnewForm.jcgCount != "") {
-                    if (res.posinType.jcgType == 1) {
-                        console.log(res.posinType);
-                        console.log(res.addnewForm.jcgCount);
-
-                        if (
-                            res.posinType.jinshijcgReliefRemaintime <
-                            Number(res.addnewForm.jcgCount) *
-                            Number(res.posinType.jcgReliefTime)
-                        ) {
-                            res.pointNames = "您所剩减免时长没有这么多";
-                        } else {
-                            console.log(this.addnewForm, "1111111111111111111111111111111111");
-                            res.addnewForm.jcgReliefAllmoney = String(
-                                res.addnewForm.jcgReliefAllmoney
-                            );
-                            this.$axios({
-                                url:
-                                    "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateJcgCount",
-                                method: "post",
-                                data: setData
-                            })
-                                .then(function (response) {
-                                    res.pointNames = "";
-                                    res.addnewForm.jcgCount = "";
-                                    res.hidden = false;
-                                    res.$message.success("充值成功");
-                                    res.addnewVisible = false;
-                                    res.getData();
-                                    console.log("123");
-                                })
-                                .catch(function (err) {
-                                    res.$message.error("充值失败: " + error);
-                                });
-                        }
-                    } else if (res.posinType.jcgType == 2) {
-                        if (
-                            res.posinType.jinshijcgReliefRemainmoney <
-                            Number(res.addnewForm.jcgCount) *
-                            Number(res.posinType.jcgReliefMoney)
-                        ) {
-                            res.pointNames = "您所剩减免金额没有这么多";
-                        } else {
-                            this.$axios({
-                                url:
-                                    "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateJcgCount",
-                                method: "post",
-                                data: setData
-                            })
-                                .then(function (response) {
-                                    res.pointNames = "";
-                                    res.addnewForm.jcgCount = "";
-                                    res.hidden = false;
-                                    res.$message.success("充值成功");
-                                    res.addnewVisible = false;
-                                    res.getData();
-                                    console.log("123");
-                                })
-                                .catch(function (error) {
-                                    // res.$message.error("充值失败: " + error);
-                                });
-                        }
+                if (res.addnewForm.count !== "") {
+                    if (res.posinType.type === 1) {
+                        // console.log(res.posinType);
+                        // console.log(res.addnewForm.jcgCount);
+                        //
+                        // if (
+                        //     res.posinType.jinshijcgReliefRemaintime <
+                        //     Number(res.addnewForm.jcgCount) *
+                        //     Number(res.posinType.jcgReliefTime)
+                        // ) {
+                        //     res.pointNames = "您所剩减免时长没有这么多";
+                        // } else {
+                        //     console.log(this.addnewForm, "1111111111111111111111111111111111");
+                        //     res.addnewForm.jcgReliefAllmoney = String(
+                        //         res.addnewForm.jcgReliefAllmoney
+                        //     );
+                        //     this.$axios({
+                        //         url:
+                        //             "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateJcgCount",
+                        //         method: "post",
+                        //         data: setData
+                        //     })
+                        //         .then(function (response) {
+                        //             res.pointNames = "";
+                        //             res.addnewForm.jcgCount = "";
+                        //             res.hidden = false;
+                        //             res.$message.success("充值成功");
+                        //             res.addnewVisible = false;
+                        //             res.getData();
+                        //             console.log("123");
+                        //         })
+                        //         .catch(function (err) {
+                        //             res.$message.error("充值失败: " + error);
+                        //         });
+                        // }
+                    } else if (res.posinType.type == 2) {
+                        // if (
+                        //     res.posinType.jinshijcgReliefRemainmoney <
+                        //     Number(res.addnewForm.jcgCount) *
+                        //     Number(res.posinType.jcgReliefMoney)
+                        // ) {
+                        //     res.pointNames = "您所剩减免金额没有这么多";
+                        // } else {
+                        //     this.$axios({
+                        //         url:
+                        //             "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateJcgCount",
+                        //         method: "post",
+                        //         data: setData
+                        //     })
+                        //         .then(function (response) {
+                        //             res.pointNames = "";
+                        //             res.addnewForm.jcgCount = "";
+                        //             res.hidden = false;
+                        //             res.$message.success("充值成功");
+                        //             res.addnewVisible = false;
+                        //             res.getData();
+                        //             console.log("123");
+                        //         })
+                        //         .catch(function (error) {
+                        //             // res.$message.error("充值失败: " + error);
+                        //         });
+                        // }
                     } else {
                         if (
-                            res.posinType.jinshicountdataA < Number(res.addnewForm.jcgCount)
+                            res.posinType.remaincount < Number(res.addnewForm.count)
                         ) {
                             res.pointNames = "您所剩减免优惠券没有这么多";
                         } else {
-                            this.$axios({
-                                url:
-                                    "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateJcgCount",
-                                method: "post",
-                                data: setData
-                            })
-                                .then(function (response) {
-                                    res.pointNames = "";
-                                    res.addnewForm.jcgCount = "";
-                                    res.hidden = false;
-                                    res.$message.success("充值成功");
-                                    res.addnewVisible = false;
-                                    res.getData();
-                                    console.log("123");
-                                })
-                                .catch(function (err) {
-                                    res.$message.error("充值失败: " + error);
-                                });
+                            // this.$axios({
+                            //     url:
+                            //         "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateJcgCount",
+                            //     method: "post",
+                            //     data: setData
+                            // })
+                            //     .then(function (response) {
+                            //         res.pointNames = "";
+                            //         res.addnewForm.count = "";
+                            //         res.hidden = false;
+                            //         res.$message.success("充值成功");
+                            //         res.addnewVisible = false;
+                            //         res.getData();
+                            //     })
+                            //     .catch(function (err) {
+                            //         res.$message.error("充值失败: " + error);
+                            //     });
                         }
                     }
                 } else {
@@ -561,7 +548,7 @@
             },
             //失去焦点事件
             blur() {
-                if (parseInt(this.addnewForm.jcgCount) <= parseInt(this.couponCount)) {
+                if (parseInt(this.addnewForm.count) <= parseInt(this.remaincount)) {
                     this.hidden = false;
                 } else {
                     this.hidden = true;

@@ -49,6 +49,11 @@
 					    title: '优惠券订单'
                     },
                     {
+                        icon: 'el-icon-lx-cascades',
+                        index: 'couponOrderHistory',
+                        title: '优惠券订单历史'
+                    },
+                    {
 					    icon: 'el-icon-lx-cascades',
 					    index: 'couponCheck',
 					    title: '优惠券生成'
