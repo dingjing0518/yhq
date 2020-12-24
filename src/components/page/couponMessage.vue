@@ -8,13 +8,7 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <el-table
-                    :data="tableData"
-                    border
-                    class="table"
-                    ref="multipleTable"
-                    @selection-change="handleSelectionChange"
-            >
+            <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" align="center" class-name="table"></el-table-column>
                 <el-table-column type="index" width="50" align="center" label="序号" class-name="table"></el-table-column>
                 <el-table-column prop="id" v-if="false"></el-table-column>
@@ -24,14 +18,11 @@
                 <el-table-column prop="endtime" label="结束时间" class-name="table"></el-table-column>
                 <el-table-column prop="count" label="减免券总数量" class-name="table"></el-table-column>
                 <el-table-column prop="remaincount" label="减免券剩余量" class-name="table"></el-table-column>
+<!--                <el-table-column prop="jcgReliefAlltime" label="减免时长" class-name="table"></el-table-column>-->
+<!--                <el-table-column prop="jcgReliefAllmoney" label="减免金额" class-name="table"></el-table-column>-->
                 <el-table-column label="操作" width="180" align="center" class-name="table">
                     <template slot-scope="scope">
-                        <el-button
-                                type="text"
-                                icon="el-icon-edit"
-                                @click="handleEdit(scope.$index, scope.row)"
-                        >生成
-                        </el-button>
+                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">生成</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -52,51 +43,33 @@
                 </el-form-item>
                 <span class="span_addserver" v-if="addserver!=''">{{addserver}}</span>
                 <el-form-item label="优惠券类型" prop="coupontype">
-                    <el-select v-model="addForm.coupontype" @change="chooseCoupon" :disabled="flagNum">
+                    <el-select v-model="addForm.coupontype" :disabled="flagNum">
                         <el-option v-for="item in couponType" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="减免时长" prop="time">
-                    <el-input v-model="addForm.jcgReliefTime" placeholder="减免时长（小时）" :disabled="flagTime"></el-input>
+                <el-form-item label="减免时长" prop="reductiontime">
+                    <el-input v-model="addForm.reductiontime" placeholder="减免时长（小时）" :disabled="flagTime"></el-input>
                 </el-form-item>
-                <el-form-item label="减免金额" prop="money">
-                    <el-input v-model="addForm.jcgReliefMoney" placeholder="减免金额（元）" :disabled="flagMoney"></el-input>
-                </el-form-item>
-
-                <el-form-item label="开始日期" prop="jcgStartdata">
-                    <el-date-picker
-                            v-model="addForm.jcgStartdata"
-                            type="datetime"
-                            :picker-options="{
-              selectableRange: '00:00:00 - 00:00:00'
-            }"
-                            placeholder="生效时间，默认无失效日期"
-                    ></el-date-picker>
-                </el-form-item>
-                <el-form-item label="结束日期" prop="jcgEnddata">
-                    <el-date-picker
-                            v-model="addForm.jcgEnddata"
-                            type="datetime"
-                            :picker-options="{
-              selectableRange: '23:59:59 - 23:59:59'
-            }"
-                            placeholder="生效时间，默认无失效日期"
-                    ></el-date-picker>
+                <el-form-item label="减免金额" prop="reductionmoney">
+                    <el-input v-model="addForm.reductionmoney" placeholder="减免金额（元）" :disabled="flagMoney"></el-input>
                 </el-form-item>
 
+                <el-form-item label="开始日期" prop="startdata">
+                    <el-date-picker type="datetime" v-model="addForm.startdata"  placeholder="生效时间，默认无失效日期"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="结束日期" prop="enddata">
+                    <el-date-picker type="datetime" v-model="addForm.enddata"  placeholder="生效时间，默认无失效日期"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="开始时间" prop="starttime">
+                    <el-time-picker v-model="addForm.starttime" value-format = 'HH:mm:ss' :picker-options="{selectableRange: '00:00:00 - 23:59:59'}" placeholder="任意时间点"></el-time-picker>
+                </el-form-item>
+                <el-form-item label="结束时间" prop="endtime">
+                    <el-time-picker v-model="addForm.endtime" value-format = 'HH:mm:ss'  :picker-options="{selectableRange: '00:00:00 - 23:59:59'}" placeholder="任意时间点"></el-time-picker>
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
         <el-button @click="editVisibleCoupon = false">取 消</el-button>
         <el-button type="primary" @click="saveEdit">确 定</el-button>
-      </span>
-        </el-dialog>
-        <!-- 添加弹出框 结束-->
-        <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
-            <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
-            <span slot="footer" class="dialog-footer">
-        <el-button @click="delVisible = false">取 消</el-button>
-        <el-button type="primary" @click="deleteRow">确 定</el-button>
       </span>
         </el-dialog>
     </div>
@@ -108,20 +81,45 @@
         name: "carManager",
         data() {
 
-            let addjcgEnddata = (rule, value, callback) => {
-                var date1 = new Date(this.editForm.jcgStartdata);
+            let addEnddata = (rule, value, callback) => {
+                var date1 = new Date(this.addForm.startdata);
                 var time1 = date1.getTime();
 
-                var date2 = new Date(this.editForm.jcgEnddata);
+                var date2 = new Date(this.addForm.enddata);
                 var time2 = date2.getTime();
                 if (time1 > time2) {
-                    callback(new Error("结束时间不能早与开始时间"));
-                    console.log("12");
+                    callback(new Error("结束日期不能早与开始日期"));
                 } else {
                     callback();
-                    console.log("13");
                 }
             };
+            let addEndTime = (rule, value, callback) => {
+                var array = this.addForm.starttime.split(":");
+                var total = array[0] * 3600 + array[1] * 60 + array[2];
+
+                var array2 = this.addForm.endtime;
+                var total2 = array2[0] * 3600 + array2[1] * 60 + array2[2];
+                if (total > total2) {
+                    callback(new Error("结束时间不能早与开始时间"));
+                } else {
+                    callback();
+                }
+            };
+            let addreductiontime = (rule, value, callback) => {
+                if (this.addForm.reductiontime === '' || this.addForm.reductiontime === undefined) {
+                    callback(new Error("减免时长不能为空"));
+                } else {
+                    callback();
+                }
+            };
+            let addreductionmoney = (rule, value, callback) => {
+                if (this.addForm.reductionmoney === '' || this.addForm.reductionmoney === undefined) {
+                    callback(new Error("减免金额不能为空"));
+                } else {
+                    callback();
+                }
+            };
+
             return {
                 coupon: [],
                 bc: [],
@@ -148,19 +146,21 @@
                 remaincount: "",
                 Alltime: "",
                 AllMoney: "",
+                couponStarttime:"",
                 addForm: {
                     couponname: "",
                     count: "",
-                    jcgStartdata: "",
-                    jcgEnddata: "",
-                    jcgStarttime: "",
-                    jcgEndtime: "",
-                    jcgBcName: "",
-                    jcgAgentName: "",
-                    jcgParkingName: "",
-                    jcgAreaName: "",
-                    jcgCouponName: "",
-                    couponId: ""
+                    startdata: "",
+                    coupontype:"",
+                    enddata: "",
+                    starttime: "",
+                    endtime:"",
+                    areaid:"",
+                    shopid:"",
+                    parkid:"",
+                    couponId: "",
+                    reductiontime: "", // 减免时长
+                    reductionmoney: ""// 减免金额
                 },
                 addFormRules: {
                     couponname: [
@@ -172,9 +172,21 @@
                         {pattern: /^[0-9]+$/, message: "请输入正确的数量"},
 
                     ],
-                    jcgEnddata: [
+                    enddata: [
+                        {required: true, message: "请输入结束日期", trigger: "blur"},
+                        {validator: addEnddata, trigger: "blur"}
+                    ],
+                    endtime: [
                         {required: true, message: "请输入结束时间", trigger: "blur"},
-                        {validator: addjcgEnddata, trigger: "blur"}
+                        {validator: addEndTime, trigger: "blur"}
+                    ],
+                    reductiontime:[
+                        {required: true, message: "请输入减免时长", trigger: "blur"},
+                        {validator: addreductiontime, trigger: "blur"}
+                    ],
+                    reductionmoney: [
+                        {required: true, message: "请输入减免金额", trigger: "blur"},
+                        {validator: addreductionmoney, trigger: "blur"}
                     ]
                 },
                 options: [],
@@ -208,10 +220,6 @@
         },
         created() {
             this.getData();
-            // this.getAgent();
-            // this.getArea();
-            // this.getParking();
-            // this.getBc();
         },
         computed: {
             data() {
@@ -236,48 +244,7 @@
             }
         },
         methods: {
-            dateChangebirthdayC(val) {
-                console.log(val);
-                this.addForm.couponStarttime = val;
-                this.editForm.couponStarttime = val;
-            },
-            dateChangebirthdayD(val) {
-                console.log(val);
-                this.editForm.couponEndtime = val;
-            },
-            dateFormatterexpirationTime(row, column) {
-                let datetime = row.expirationTime;
-                if (datetime) {
-                    datetime = new Date(datetime);
-                    let y = datetime.getFullYear() + "-";
-                    let mon = datetime.getMonth() + 1 + "-";
-                    let d = datetime.getDate();
 
-                    return y + mon + d;
-                }
-                return "";
-            },
-            dateFormatter(row, column) {
-                let datetime = row.joinTime;
-                if (datetime) {
-                    datetime = new Date(datetime);
-                    let y = datetime.getFullYear() + "-";
-                    let mon = datetime.getMonth() + 1 + "-";
-                    let d = datetime.getDate();
-                    return y + mon + d;
-                }
-                return "";
-            },
-            //每页显示个数改变
-            handleSizeChange(val) {
-                this.pagesize = val;
-                this.getData();
-            },
-            // 分页导航
-            handleCurrentChange(val) {
-                this.cur_page = val;
-                this.getData();
-            },
             // 获取数据
             getData() {
                 var res = this;
@@ -288,7 +255,6 @@
                         "&parkingId=" +
                         localStorage.getItem("parkingId"),
                     method: "get"
-                    // data: { pageNum: res.cur_page, pageSize: res.pagesize }
                 })
                     .then(function (response) {
                         if (response.data.status === 200) {
@@ -298,8 +264,6 @@
                                 res.tableData[i]["names"] = ""
                             }
                             for (let i = 0; i < res.tableData.length; i++) {
-
-
                                 if (res.tableData[i].coupontype == 0) {
                                     res.tableData[i].names = "全免劵"
                                 } else if (res.tableData[i].coupontype == 1) {
@@ -310,8 +274,6 @@
                                     res.tableData[i].names = "当天有效全免劵"
                                 }
                             }
-                            // res.totalRecords = response.data.couponGenerateRecords; //总条数
-
                         }
                     })
                     .catch(function (error) {
@@ -319,117 +281,9 @@
                         console.log(error);
                     });
             },
-            getAgent() {
-                this.agent.length = 0;
-                var res = this;
-                this.$axios({
-                    url:
-                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/selectAllAgent",
-                    method: "post",
-                    data: {}
-                })
-                    .then(function (response) {
-                        for (var i = 0; i < response.data.agentNameData.length; i++) {
-                            res.agent.push({
-                                jcgAgentName: response.data.agentNameData[i].username
-                            });
-                        }
-                    })
-                    .catch(function (error) {
-                        res.$message.error("查询失败: " + error);
-                    });
-            },
-            getArea() {
-                this.area.length = 0;
-                var res = this;
-                this.$axios({
-                    url:
-                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/selectAreaNameAll",
-                    method: "get",
-                    data: {}
-                })
-                    .then(function (response) {
-                        for (var i = 0; i < response.data.areaNameData.length; i++) {
-                            res.area.push({
-                                jcgAreaName: response.data.areaNameData[i].areaName
-                            });
-                        }
-                    })
-                    .catch(function (error) {
-                        res.$message.error("查询失败: " + error);
-                    });
-            },
-            getParking() {
-                this.parking.length = 0;
-                var res = this;
-                this.$axios({
-                    url:
-                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/selectAllParkingName",
-                    method: "post",
-                    data: {}
-                })
-                    .then(function (response) {
-                        for (var i = 0; i < response.data.parkingNameData.length; i++) {
-                            res.parking.push({
-                                jcgParkingName: response.data.parkingNameData[i].jpName
-                            });
-                        }
-                    })
-                    .catch(function (error) {
-                        res.$message.error("查询失败: " + error);
-                    });
-            },
-            // getBc() {
-            //   this.area.length = 0;
-            //   var res = this;
-            //   this.$axios({
-            //     url:
-            //       "JinshiBusinessAccount/selectAllBusinessName",
-            //     method: "post",
-            //     data: {}
-            //   })
-            //     .then(function(response) {
-            //       for (var i = 0; i < response.data.BusinessNameData.length; i++) {
-            //         res.bc.push({
-            //           jcgBcName: response.data.BusinessNameData[i].bcName
-            //         });
-            //       }
-            //       console.log(response.data);
-            //     })
-            //     .catch(function(error) {
-            //       res.$message.error("查询失败: " + error);
-            //     });
-            // },
-            getCoupon() {
-                this.area.length = 0;
-                var res = this;
-                this.$axios({
-                    url:
-                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/selectCouponAll",
-                    method: "post",
-                    data: {}
-                })
-                    .then(function (response) {
-                        for (var i = 0; i < response.data.BusinessNameData.length; i++) {
-                            res.coupon.push({
-                                jcoCouponName: response.data.BusinessNameData[i].bcName
-                            });
-                        }
-                        console.log(response.data);
-                    })
-                    .catch(function (error) {
-                        res.$message.error("查询失败: " + error);
-                    });
-            },
-            formatter(row, column) {
-                return row.address;
-            },
-            filterTag(value, row) {
-                return row.tag === value;
-            },
-            //修改
+            //生成
             handleEdit(index, row) {
-                this.rowtime = row
+                this.rowtime = row;
                 this.names = row.names;//优惠券类型名称
                 this.remaincount = row.remaincount;//剩余优惠券数量
                 if (row.coupontype === "1") {
@@ -452,73 +306,43 @@
                 this.addForm = {
                     couponname: "",
                     coupontype: Number(row.coupontype),
-                    count: row.count,
+                    count:"",
                     couponId: row.id,
-                    jcgBcName: row.couponBcName,
-                    jcgAgentName: row.couponAgentName,
-                    jcgParkingName: row.couponParkingName,
-                    jcgAreaName: row.couponAreaName,
-                    jcgCouponName: row.couponName,
-                    jcgStartdata: "",
-                    jcgType: Number(row.couponType),
-                    jcgReliefTime: "", // 减免时长
-                    jcgReliefMoney: "",// 减免金额
-                    jcgReliefAllmoney: "",//减免总金额
-                    jcgReliefAlltime: "",//减免总时长
+                    areaid:row.areaid,
+                    shopid:row.shopid,
+                    parkid:row.parkid,
+                    startdata: "",
+                    starttime:"00:00:00",
+                    endtime:"23:59:59",
+                    reductiontime: "", // 减免时长
+                    reductionmoney: "",// 减免金额
                 };
-                var datetime = new Date();
-                var y = datetime.getFullYear() + "-";
-                var mon = datetime.getMonth() + 1 + "-";
-                var d = datetime.getDate();
-                var h = datetime.getHours() + ":";
-                h = h < 10 ? "0" + h : h;
-                var min = datetime.getMinutes() + ":";
-                min = min < 10 ? "0" + min : min;
-                var s = datetime.getSeconds();
-                s = s < 10 ? "0" + s : s;
-                // this.editForm.jcgStartdata = y + mon + d + " " + h + min + s;
-            },
-
-            chooseCoupon(value) {
-                console.log(value)
-                this.addForm.jcgType = value
-                if (this.addForm.jcgType == "减免时长") {
-
-                    this.flagTime = false;
-                    this.flagMoney = true;
-                    // this.editForm.jcgReliefMoney = ""
-                } else if (this.addForm.jcgType == "减免金额") {
-                    this.flagMoney = false;
-                    this.flagTime = true;
-                    // this.editForm.jcgReliefTime = ""
-                } else {
-                    this.flagTime = true;
-                    this.flagMoney = true;
-                }
+                console.log(row);
             },
             // 保存编辑
             saveEdit() {
-
-
                 // 开始时间
-                var datetime = new Date(this.editForm.jcgStartdata);
-                var y1 = datetime.getFullYear() + "-";
-                var mon1 = datetime.getMonth() + 1 + "-";
-                var d1 = datetime.getDate();
-                var hS = datetime.getHours() + ":";
-                hS = hS < 10 ? "0" + hS : hS;
-                var minS = datetime.getMinutes() + ":";
-                minS = minS < 10 ? "0" + minS : minS;
-                var sS = datetime.getSeconds();
-                sS = sS < 10 ? "0" + sS : sS;
-                this.editForm.jcgStartdata = y1 + mon1 + d1 + " " + hS + minS + sS;
+                if (this.addForm.startdata === undefined || this.addForm.startdata === '') {
+                    this.addForm.startdata = this.rowtime.starttime;
+                }else {
+                    var datetime = new Date(this.addForm.startdata);
+                    var y1 = datetime.getFullYear() + "-";
+                    var mon1 = datetime.getMonth() + 1 + "-";
+                    var d1 = datetime.getDate();
+                    var hS = datetime.getHours() + ":";
+                    hS = hS < 10 ? "0" + hS : hS;
+                    var minS = datetime.getMinutes() + ":";
+                    minS = minS < 10 ? "0" + minS : minS;
+                    var sS = datetime.getSeconds();
+                    sS = sS < 10 ? "0" + sS : sS;
+                    this.addForm.startdata = y1 + mon1 + d1 + " " + hS + minS + sS;
+                }
+
                 // 结束时间
-                console.log(this.editForm.jcgEnddata)
-                if (this.editForm.jcgEnddata == undefined) {
-                    this.editForm.jcgEnddata = "0";
-                    console.log(this.editForm.jcgEnddata)
+                if (this.addForm.enddata === undefined || this.addForm.enddata === '') {
+                    this.addForm.enddata = this.rowtime.endtime;
                 } else {
-                    var datetimeE = new Date(this.editForm.jcgEnddata);
+                    var datetimeE = new Date(this.addForm.enddata);
                     var y2 = datetimeE.getFullYear() + "-";
                     var mon2 = datetimeE.getMonth() + 1 + "-";
                     var d2 = datetimeE.getDate();
@@ -528,286 +352,65 @@
                     minE = minE < 10 ? "0" + minE : minE;
                     var sE = datetimeE.getSeconds();
                     sE = sE < 10 ? "0" + sE : sE;
-                    this.editForm.jcgEnddata = y2 + mon2 + d2 + " " + hE + minE + sE;
-                    console.log('5555555', this.editForm.jcgEnddata)
+                    this.addForm.enddata = y2 + mon2 + d2 + " " + hE + minE + sE;
                 }
-
-
                 var res = this;
-                switch (this.editForm.jcgType) {
-                    case "全免券":
-                        this.editForm.jcgType = 0;
-                        break;
-                    case "减免时长":
-                        this.editForm.jcgType = 1;
-                        break;
-                    case "减免金额":
-                        this.editForm.jcgType = 2;
-                        break;
-                    case "当天有效全免券":
-                        this.editForm.jcgType = 3;
-                        break;
-                }
-
-                console.log(this.editForm.jcgType, "panduan ")
-                if (this.editForm.jcgType == 1) {
-                    this.editForm.jcgReliefAlltime = (Number(this.editForm.jcgCount) * Number(this.editForm.jcgReliefTime))
-                    this.editForm.jcgReliefAllmoney = "";
-                    console.log(this.editForm.jcgReliefAlltime)
-                } else if (this.editForm.jcgType == 2) {
-                    this.editForm.jcgReliefAllmoney = (Number(this.editForm.jcgCount) * Number(this.editForm.jcgReliefMoney))
-                    this.editForm.jcgReliefAlltime = ""
-                } else if (this.editForm.jcgType == 3) {
-
-                    this.editForm.jcgReliefAlltime = ""
-                    this.editForm.jcgReliefAllmoney = "";
-
-
-                } else if (this.editForm.jcgType == 0) {
-                    this.editForm.jcgReliefAlltime = ""
-                    this.editForm.jcgReliefAllmoney = "";
-
-                }
-                console.log(this.editForm.jcgEnddata)
-                this.editForm.bcId = localStorage.getItem("bcId");
-                var setData = this.editForm;
-                console.log(setData.jcgEnddata);
-                console.log(this.rowtime)
-                var EndTime = new Date(this.rowtime.couponEndtime).getTime();
-                var StartTime = new Date(this.rowtime.couponStarttime).getTime();
-                var EndData = new Date(setData.jcgEnddata).getTime();
-                var StartData = new Date(setData.jcgStartdata).getTime();
-                console.log(EndTime)
-                console.log(StartTime)
-                console.log(EndData)
-                console.log(StartData)
-
-                // if(this.editForm.password==this.editForm.passwordsure)
-
-                this.$refs.editForm.validate(valid => {
-
-                    if (!valid) {
-                        res.$message.error("格式不正确");
-
-                    } else if (EndTime >= EndData && StartTime <= StartData) {
-
-                        console.log(this.AllMoney)
-                        if (this.nameS == "减免金额") {
-                            console.log("1213")
-                            var addservered = Number(this.editForm.jcgCount) * Number(this.editForm.jcgReliefMoney)
-
-                            console.log(addservered)
-                            if (addservered > Number(this.AllMoney)) {
-                                this.addserver = "总金额不能大于剩余金额"
-                            } else {
-                                this.$axios({
-                                    url:
-                                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateCouponCount",
-                                    method: "post",
-                                    data: setData
-                                })
-
-                                    .then(function (response) {
-                                        if (response.status <= 200) {
-                                            res.editVisibleCoupon = false;
-                                            res.$message.success("生成优惠券成功");
-                                            res.addserver = ""
-                                            console.log("123", response);
-                                            if (res.tableData[res.idx].id === res.id) {
-                                                res.$set(res.tableData, res.idx, res.editForm);
-                                            } else {
-                                                for (let i = 0; i < res.tableData.length; i++) {
-                                                    if (res.tableData[i].id === res.id) {
-                                                        res.$set(res.tableData, i, res.editForm);
-                                                        return;
-                                                    }
-                                                }
-                                            }
-                                            res.getData();
-                                        }
-                                    })
-                                    .catch(function (error) {
-                                        res.$message.error("修改失败！");
-                                        console.log(error);
-                                    });
-                            }
-                        } else if (this.nameS == "减免时长") {
-
-
-                            var addservertime = Number(this.editForm.jcgCount) * Number(this.editForm.jcgReliefTime)
-                            console.log(addservertime)
-                            console.log(this.Alltime)
-                            if (addservertime > Number(this.Alltime)) {
-                                this.addserver = "总时长不能大于剩余时长"
-                            } else {
-                                this.$axios({
-                                    url:
-                                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateCouponCount",
-                                    method: "post",
-                                    data: setData
-                                })
-
-                                    .then(function (response) {
-                                        if (response.status <= 200) {
-                                            res.editVisibleCoupon = false;
-                                            res.$message.success("生成优惠券成功");
-                                            res.addserver = ""
-                                            console.log("123", response);
-                                            if (res.tableData[res.idx].id === res.id) {
-                                                res.$set(res.tableData, res.idx, res.editForm);
-                                            } else {
-                                                for (let i = 0; i < res.tableData.length; i++) {
-                                                    if (res.tableData[i].id === res.id) {
-                                                        res.$set(res.tableData, i, res.editForm);
-                                                        return;
-                                                    }
-                                                }
-                                            }
-                                            res.getData();
-                                        }
-                                    })
-                                    .catch(function (error) {
-                                        res.$message.error("修改失败！");
-                                        console.log(error);
-                                    });
-                            }
-                        } else {
-
-                            if (Number(this.editForm.jcgCount) > Number(this.NumberS)) {
-                                this.addserver = "数量不能大于减免券剩余量"
-                            } else {
-                                this.$axios({
-                                    url:
-                                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateCouponCount",
-                                    method: "post",
-                                    data: setData
-                                })
-
-                                    .then(function (response) {
-                                        if (response.status <= 200) {
-                                            res.editVisibleCoupon = false;
-                                            res.$message.success("生成优惠券成功");
-                                            res.addserver = ""
-                                            console.log("123", response);
-                                            if (res.tableData[res.idx].id === res.id) {
-                                                res.$set(res.tableData, res.idx, res.editForm);
-                                            } else {
-                                                for (let i = 0; i < res.tableData.length; i++) {
-                                                    if (res.tableData[i].id === res.id) {
-                                                        res.$set(res.tableData, i, res.editForm);
-                                                        return;
-                                                    }
-                                                }
-                                            }
-                                            res.getData();
-                                        }
-                                    })
-                                    .catch(function (error) {
-                                        res.$message.error("修改失败！");
-                                        console.log(error);
-                                    });
-                            }
-                        }
-
+                var setData = this.addForm;
+                var StartTime = new Date(this.rowtime.starttime).getTime();
+                var EndTime = new Date(this.rowtime.endtime).getTime();
+                var EndData= new Date(setData.startdata).getTime();
+                var StartData= new Date(setData.enddata).getTime();
+                if (EndTime >= EndData && StartTime <= StartData) {
+                    if (this.names === "减免金额") {
+                        //todo
+                    } else if (this.nameS === "减免时长") {
+                        //todo
                     } else {
-                        res.$message.error("输入的时间在有效时间内")
-
-
+                        //todo
+                        if (Number(this.addForm.count) > Number(this.remaincount)) {
+                            this.addserver = "数量不能大于减免券剩余量"
+                        } else {
+                            //todo
+                        }
+                        //     this.$axios({
+                        //         url:
+                        //             "http://yun.jinshipark.com:81/shopCouponManager/updateCouponCount",
+                        //         method: "post",
+                        //         data: setData
+                        //     })
+                        //         .then(function (response) {
+                        //             if (response.status <= 200) {
+                        //                 res.editVisibleCoupon = false;
+                        //                 res.$message.success("生成优惠券成功");
+                        //                 res.addserver = ""
+                        //                 console.log("123", response);
+                        //                 if (res.tableData[res.idx].id === res.id) {
+                        //                     res.$set(res.tableData, res.idx, res.editForm);
+                        //                 } else {
+                        //                     for (let i = 0; i < res.tableData.length; i++) {
+                        //                         if (res.tableData[i].id === res.id) {
+                        //                             res.$set(res.tableData, i, res.editForm);
+                        //                             return;
+                        //                         }
+                        //                     }
+                        //                 }
+                        //                 res.getData();
+                        //             }
+                        //         })
+                        //         .catch(function (error) {
+                        //             res.$message.error("修改失败！");
+                        //             console.log(error);
+                        //         });
+                        // }
                     }
 
-                    // 验证通过后的处理...
-                });
-            },
-            handleDelete(index, row) {
-                this.idx = index;
-                this.id = row.couponId;
-                console.log(this.id);
-                this.delVisible = true;
-            },
-            delAll() {
-                const length = this.multipleSelection.length;
-                let str = "";
-                this.del_list = this.del_list.concat(this.multipleSelection);
-                for (let i = 0; i < length; i++) {
-                    str += this.multipleSelection[i].name + " ";
+                } else {
+                    res.$message.error("输入的时间在有效时间内")
                 }
-                this.$message.success("删除了" + str);
-                this.multipleSelection = [];
+
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
-            },
-            // 添加
-            saveAdd() {
-                console.log(this.addForm.passWord, this.addForm.passwordsure);
-                if (this.addForm.passWord == this.addForm.passwordsure) {
-                    var res = this;
-                    res.addForm.rolename = res.value;
-                    if (res.jcgEndtime == NaN) {
-                        res.jcgEndtime = ""
-                    }
-                    var setData = this.addForm;
-                    this.$refs.addForm.validate(valid => {
-                        if (!valid) {
-                            res.$message.success("格式不正确");
-                        } else {
-                            this.$axios({
-                                url:
-                                    "http://yun.jinshipark.com:81/JinshiCouponGenerate/insert",
-                                method: "post",
-                                data: setData
-                            })
-                                .then(function (response) {
-                                    if (response.status <= 200) {
-                                        if (response.data.code == 1) {
-                                            res.$message.error("用户名已存在");
-                                        } else {
-                                            res.addVisible = false;
-                                            res.$message.success("添加成功");
-                                            res.getData();
-                                        }
-                                    }
-                                })
-                                .catch(function (error) {
-                                    res.$message.error("添加失败！");
-                                    console.log(error);
-                                });
-                        }
-                    });
-                } else {
-                    alert("两次密码不一致");
-                }
-            },
-            // 确定删除
-            deleteRow() {
-                var res = this;
-                this.$axios({
-                    url:
-                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/deleteByPrimaryKey?id=" +
-                        res.id,
-                    method: "post",
-                    data: {id: res.id}
-                })
-                    .then(function (response) {
-                        if (response.status <= 200) {
-                            res.$message.success("删除成功");
-                            res.delVisible = false;
-                            if (res.tableData[res.idx].id === res.id) {
-                                res.tableData.splice(res.idx, 1);
-                            } else {
-                                for (let i = 0; i < res.tableData.length; i++) {
-                                    if (res.tableData[i].id === res.id) {
-                                        res.tableData.splice(i, 1);
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    })
-                    .catch(function (error) {
-                        res.$message.success("删除失败！");
-                        console.log(error);
-                    });
             }
         }
     };
