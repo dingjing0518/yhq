@@ -37,19 +37,19 @@
       >
         <el-table-column type="selection" width="50" align="center" class-name="table"></el-table-column>
         <el-table-column type="index" width="50" align="center" label="序号" class-name="table"></el-table-column>
-        <el-table-column prop="jcoPlate" label="车牌号" class-name="table"></el-table-column>
+        <el-table-column prop="plate" label="车牌号" class-name="table"></el-table-column>
         <!-- 
         <el-table-column prop="jcoType" label="类型" class-name="table"></el-table-column>
         <el-table-column prop="jcoCarColor" label="颜色" class-name="table"></el-table-column>
         <el-table-column prop="jcoCarType" label="车类型" class-name="table"></el-table-column>-->
-        <el-table-column prop="jcoInboundTime" label="进场时间" :formatter="dateFormatter" class-name="table"></el-table-column>
-        <el-table-column prop="jcoDepartureTime" label="出场时间" :formatter="dateFormatterexpirationTime" class-name="table"></el-table-column>
-        <el-table-column prop="jcoOften" label="停车时间" class-name="table"></el-table-column>
+        <el-table-column prop="intime" label="进场时间" :formatter="dateFormatter" class-name="table"></el-table-column>
+        <el-table-column prop="outtime" label="出场时间" :formatter="dateFormatterexpirationTime" class-name="table"></el-table-column>
+        <el-table-column prop="parktime" label="停车时间" class-name="table"></el-table-column>
         <el-table-column prop="actualTime" label="实际支付时间" class-name="table"></el-table-column>
         <el-table-column prop="jcoParkingName" label="车场名称" class-name="table"></el-table-column>
         <el-table-column prop="jcoAreaName" label="区域名称"  class-name="table"></el-table-column>
-         <el-table-column prop="jcoOrderId" label="订单号" class-name="table"></el-table-column>
-        <el-table-column prop="jcoCreatetime" label="创建时间" class-name="table"></el-table-column>
+         <el-table-column prop="orderid" label="订单号" class-name="table"></el-table-column>
+        <el-table-column prop="createtime" label="创建时间" class-name="table"></el-table-column>
         <!-- 
         <el-table-column prop="jcoAgentName" label="代理商" class-name="table"></el-table-column>
         <el-table-column prop="jcoParkingName" label="停车场" class-name="table"></el-table-column>
@@ -396,7 +396,7 @@ export default {
       var res = this;
       // 搜索
       this.$axios({
-        url: "http://yun.jinshipark.com:81/JinshiCouponOrder/searchCouponOrder",
+        url: this.GLOBAL._SERVER_API_ +"couponOrderHistoryManager/searchCouponOrderHistory",
         method: "post",
         data: {
           keyWord: res.select_word,
@@ -404,32 +404,27 @@ export default {
           pageSize: res.pagesize,
           startTime:res.valuetime, 
           endTime:res.valuetimeA,
-          bcId : Number(localStorage.getItem("bcId"))
+          shopId : Number(localStorage.getItem("shopid"))
         }
       })
         .then(function(response) {
-          if (response.status <= 200) {
-            console.log(response)
-            for(var i=0;i<response.data.couponOrderData.length;i++){
-              if(response.data.couponOrderData[i].jcoOften){
-                response.data.couponOrderData[i].jcoOften =  response.data.couponOrderData[i].jcoOften
-              }else{
-                response.data.couponOrderData[i].jcoOften = ""
-              }
-              if(response.data.couponOrderData[i].jcoCreatetime){
-                  var date = new Date(response.data.couponOrderData[i].jcoCreatetime);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+          if (response.data.status === 200) {
+            console.log(response.data.data);
+            for(var i=0;i<response.data.data.rows.length;i++){
+              if(response.data.data.rows[i].createtime){
+                var date = new Date(response.data.data.rows[i].createtime);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
                 var Y = date.getFullYear() + '-';
                 var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
                 var D = date.getDate() + ' ';
                 var h = date.getHours() + ':';
                 var m = date.getMinutes() + ':';
                 var s = date.getSeconds();
-                response.data.couponOrderData[i].jcoCreatetime= Y + M + D +" "+ h + m + s;
+                response.data.data.rows[i].createtime= Y + M + D +" "+ h + m + s;
               }
             }
-            res.tableData = response.data.couponOrderData;
-            res.totalRecords = response.data.couponOrderRecords; //总条数
-            
+            res.tableData = response.data.data.rows;
+            res.totalRecords = response.data.data.records; //总条数
+
           }
           
         })
@@ -453,7 +448,7 @@ export default {
       this.editForm.couponEndtime = val;
     },
     dateFormatterexpirationTime(row, column) {
-      let datetime = row.jcoDepartureTime;
+      let datetime = row.outtime;
       if (datetime) {
         datetime = new Date(datetime);
         let y = datetime.getFullYear() + "-";
@@ -467,7 +462,7 @@ export default {
       return "";
     },
     dateFormatter(row, column) {
-      let datetime = row.jcoInboundTime;
+      let datetime = row.intime;
       if (datetime) {
         datetime = new Date(datetime);
         let y = datetime.getFullYear() + "-";
@@ -505,41 +500,6 @@ export default {
     getData() {
       this.numberer = 0;
       var res = this;
-      // this.$axios({
-      //   url:
-      //     "http://yun.jinshipark.com:81/JinshiCouponOrder/selectCouponOrderAll",
-      //      method: "post",
-      //      data: { pageNum: res.cur_page, pageSize: res.pagesize,bcId:parseInt(localStorage.getItem('bcId'))}
-      // })
-      //   .then(function(response) {
-      //     if (response.status <= 200) {
-      //       console.log(response)
-      //       for(var i=0;i<response.data.couponOrderData.length;i++){
-      //         if(response.data.couponOrderData[i].jcoOften){
-      //           response.data.couponOrderData[i].jcoOften = response.data.couponOrderData[i].jcoOften
-      //         }else{
-      //           response.data.couponOrderData[i].jcoOften = ""
-      //         }
-      //         // if(response.data.couponOrderData[i].jcoCreatetime){
-      //         //     var date = new Date(response.data.couponOrderData[i].jcoCreatetime);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
-      //         //   var Y = date.getFullYear() + '-';
-      //         //   var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
-      //         //   var D = date.getDate() + ' ';
-      //         //   var h = date.getHours() + ':';
-      //         //   var m = date.getMinutes() + ':';
-      //         //   var s = date.getSeconds();
-      //         //   response.data.couponOrderData[i].jcoCreatetime= Y + M + D +" "+ h + m + s;
-      //         // }
-      //       }
-            
-      //       res.tableData = response.data.couponOrderData;
-      //       res.totalRecords = response.data.couponOrderRecords; //总条数
-      //     }
-      //   })
-      //   .catch(function(error) {
-      //     res.$message.error("查询失败: " + error);
-      //     console.log(error);
-      //   });
       var dataTime = new Date()
       console.log(dataTime)
       var Y = dataTime.getFullYear() + '-';
@@ -550,8 +510,7 @@ export default {
       var timeEnd = Y + M + D;
       console.log(timeStart,timeEnd)
        this.$axios({
-        url: "http://yun.jinshipark.com:81/JinshiCouponOrder/searchCouponOrder",
-        
+         url: this.GLOBAL._SERVER_API_ +"couponOrderHistoryManager/searchCouponOrderHistory",
         method: "post",
         data: {
           keyWord: res.select_word,
@@ -559,31 +518,26 @@ export default {
           pageSize: res.pagesize,
           startTime:timeStart, 
           endTime:timeEnd,
-          bcId : Number(localStorage.getItem("bcId"))
+          shopId : Number(localStorage.getItem("shopid"))
         }
       })
         .then(function(response) {
-          if (response.status <= 200) {
-            console.log(response)
-            for(var i=0;i<response.data.couponOrderData.length;i++){
-              if(response.data.couponOrderData[i].jcoOften){
-                response.data.couponOrderData[i].jcoOften =  response.data.couponOrderData[i].jcoOften
-              }else{
-                response.data.couponOrderData[i].jcoOften = ""
-              }
-              if(response.data.couponOrderData[i].jcoCreatetime){
-                  var date = new Date(response.data.couponOrderData[i].jcoCreatetime);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+          if (response.data.status == 200) {
+            console.log(response.data.data);
+            for(var i=0;i<response.data.data.rows.length;i++){
+              if(response.data.data.rows[i].createtime){
+                var date = new Date(response.data.data.rows[i].createtime);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
                 var Y = date.getFullYear() + '-';
                 var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
                 var D = date.getDate() + ' ';
                 var h = date.getHours() + ':';
                 var m = date.getMinutes() + ':';
                 var s = date.getSeconds();
-                response.data.couponOrderData[i].jcoCreatetime= Y + M + D +" "+ h + m + s;
+                response.data.data.rows[i].createtime= Y + M + D +" "+ h + m + s;
               }
             }
-            res.tableData = response.data.couponOrderData;
-            res.totalRecords = response.data.couponOrderRecords; //总条数
+            res.tableData = response.data.data.rows;
+            res.totalRecords = response.data.data.records; //总条数
             
           }
           
