@@ -18,6 +18,12 @@ export default new Router({
                     component: resolve => require(['../components/page/couponMessage.vue'], resolve),
                     meta: { title: '优惠券管理' }
                 },
+                //优惠券生成
+                {
+                    path: '/couponCheck',
+                    component: resolve => require(['../components/page/couponCheck.vue'], resolve),
+                    meta: { title: '优惠券生成' }
+                },
                 //订单查询
                 {
                     path: '/couponOrder',
@@ -28,12 +34,6 @@ export default new Router({
                     path: '/couponOrderHistory',
                     component: resolve => require(['../components/page/couponOrderHistory.vue'], resolve),
                     meta: { title: '优惠券订单历史' }
-                },
-                //优惠券生成
-                {
-                    path: '/couponCheck',
-                    component: resolve => require(['../components/page/couponCheck.vue'], resolve),
-                    meta: { title: '优惠券生成' }
                 },
                 {
                     path: '/404',

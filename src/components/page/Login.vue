@@ -100,7 +100,7 @@
             userMessage(formName) {
                 var res = this
                 this.$axios({
-                    url: this.GLOBAL._SERVER_API_ + 'user/login?loginName=' + res.ruleForm.loginName + '&password=' + md5(res.ruleForm.password),
+                    url: this.GLOBAL._SERVER_API_ + 'user/login?loginName=' + res.ruleForm.loginName + '&password=' + md5(res.ruleForm.password).toUpperCase(),
                     method: 'get'
                 }).then(function (response) {
                     if (response.data.status == 200) {

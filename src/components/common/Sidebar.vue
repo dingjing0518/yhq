@@ -43,6 +43,11 @@
 					    index: 'couponMessage',
 					    title: '优惠券管理'
 					},
+                    {
+                        icon: 'el-icon-lx-cascades',
+                        index: 'couponCheck',
+                        title: '优惠券生成'
+                    },
 					{
 					    icon: 'el-icon-lx-cascades',
 					    index: 'couponOrder',
@@ -52,12 +57,7 @@
                         icon: 'el-icon-lx-cascades',
                         index: 'couponOrderHistory',
                         title: '优惠券订单历史'
-                    },
-                    {
-					    icon: 'el-icon-lx-cascades',
-					    index: 'couponCheck',
-					    title: '优惠券生成'
-					}
+                    }
                 ]
             }
         },

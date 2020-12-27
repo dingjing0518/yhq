@@ -8,21 +8,25 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+            <el-table :data="tableData" border class="table" ref="multipleTable"
+                      @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" align="center" class-name="table"></el-table-column>
                 <el-table-column type="index" width="50" align="center" label="序号" class-name="table"></el-table-column>
                 <el-table-column prop="id" v-if="false"></el-table-column>
                 <el-table-column prop="names" label="优惠券类型" class-name="table"></el-table-column>
                 <el-table-column prop="couponname" label="减免券名称" class-name="table"></el-table-column>
-                <el-table-column prop="starttime" label="开始时间" class-name="table"></el-table-column>
-                <el-table-column prop="endtime" label="结束时间" class-name="table"></el-table-column>
+                <el-table-column prop="starttime" label="开始日期" class-name="table"></el-table-column>
+                <el-table-column prop="endtime" label="结束日期"   class-name="table" ></el-table-column>
                 <el-table-column prop="count" label="减免券总数量" class-name="table"></el-table-column>
                 <el-table-column prop="remaincount" label="减免券剩余量" class-name="table"></el-table-column>
-<!--                <el-table-column prop="jcgReliefAlltime" label="减免时长" class-name="table"></el-table-column>-->
-<!--                <el-table-column prop="jcgReliefAllmoney" label="减免金额" class-name="table"></el-table-column>-->
+                <!--                <el-table-column prop="jcgReliefAlltime" label="减免时长" class-name="table"></el-table-column>-->
+                <!--                <el-table-column prop="jcgReliefAllmoney" label="减免金额" class-name="table"></el-table-column>-->
                 <el-table-column label="操作" width="180" align="center" class-name="table">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">生成</el-button>
+<!--                        <el-button type="text" v-show="scope.row.isShow" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">生成-->
+<!--                        </el-button>-->
+                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">生成
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -44,7 +48,8 @@
                 <span class="span_addserver" v-if="addserver!=''">{{addserver}}</span>
                 <el-form-item label="优惠券类型" prop="coupontype">
                     <el-select v-model="addForm.coupontype" :disabled="flagNum">
-                        <el-option v-for="item in couponType" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                        <el-option v-for="item in couponType" :key="item.value" :label="item.label"
+                                   :value="item.value"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="减免时长" prop="reductiontime">
@@ -55,16 +60,22 @@
                 </el-form-item>
 
                 <el-form-item label="开始日期" prop="startdata">
-                    <el-date-picker type="datetime" v-model="addForm.startdata"  placeholder="生效时间，默认无失效日期"></el-date-picker>
+                    <el-date-picker type="datetime" v-model="addForm.startdata"
+                                    placeholder="生效时间，默认无失效日期"></el-date-picker>
                 </el-form-item>
                 <el-form-item label="结束日期" prop="enddata">
-                    <el-date-picker type="datetime" v-model="addForm.enddata"  placeholder="生效时间，默认无失效日期"></el-date-picker>
+                    <el-date-picker type="datetime" v-model="addForm.enddata"
+                                    placeholder="生效时间，默认无失效日期"></el-date-picker>
                 </el-form-item>
                 <el-form-item label="开始时间" prop="starttime">
-                    <el-time-picker v-model="addForm.starttime" value-format = 'HH:mm:ss' :picker-options="{selectableRange: '00:00:00 - 23:59:59'}" placeholder="任意时间点"></el-time-picker>
+                    <el-time-picker v-model="addForm.starttime" value-format='HH:mm:ss'
+                                    :picker-options="{selectableRange: '00:00:00 - 23:59:59'}"
+                                    placeholder="任意时间点"></el-time-picker>
                 </el-form-item>
                 <el-form-item label="结束时间" prop="endtime">
-                    <el-time-picker v-model="addForm.endtime" value-format = 'HH:mm:ss'  :picker-options="{selectableRange: '00:00:00 - 23:59:59'}" placeholder="任意时间点"></el-time-picker>
+                    <el-time-picker v-model="addForm.endtime" value-format='HH:mm:ss'
+                                    :picker-options="{selectableRange: '00:00:00 - 23:59:59'}"
+                                    placeholder="任意时间点"></el-time-picker>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -77,6 +88,7 @@
 
 <script>
     import Validator from "async-validator";
+
     export default {
         name: "carManager",
         data() {
@@ -146,19 +158,20 @@
                 remaincount: "",
                 Alltime: "",
                 AllMoney: "",
-                couponStarttime:"",
+                couponStarttime: "",
                 addForm: {
                     couponname: "",
                     count: "",
                     startdata: "",
-                    coupontype:"",
+                    coupontype: "",
                     enddata: "",
                     starttime: "",
-                    endtime:"",
-                    areaid:"",
-                    shopid:"",
-                    parkid:"",
+                    endtime: "",
+                    areaid: "",
+                    shopid: "",
+                    parkid: "",
                     couponId: "",
+                    agentid: "",
                     reductiontime: "", // 减免时长
                     reductionmoney: ""// 减免金额
                 },
@@ -180,7 +193,7 @@
                         {required: true, message: "请输入结束时间", trigger: "blur"},
                         {validator: addEndTime, trigger: "blur"}
                     ],
-                    reductiontime:[
+                    reductiontime: [
                         {required: true, message: "请输入减免时长", trigger: "blur"},
                         {validator: addreductiontime, trigger: "blur"}
                     ],
@@ -274,6 +287,15 @@
                                     res.tableData[i].names = "当天有效全免劵"
                                 }
                             }
+                            for (let i = 0; i < res.tableData.length; i++) {
+                                var DateTime = new Date();
+                                var endtime = new Date(tableData[i].endtime);
+                                if (DateTime.getTime() > endtime.getTime()) {
+                                    res.tableData[i].isShow = false;
+                                }else {
+                                    res.tableData[i].isShow = true;
+                                }
+                            }
                         }
                     })
                     .catch(function (error) {
@@ -306,14 +328,15 @@
                 this.addForm = {
                     couponname: "",
                     coupontype: Number(row.coupontype),
-                    count:"",
+                    count: "",
+                    agentid: row.agentid,
                     couponId: row.id,
-                    areaid:row.areaid,
-                    shopid:row.shopid,
-                    parkid:row.parkid,
+                    areaid: row.areaid,
+                    shopid: row.shopid,
+                    parkid: row.parkid,
                     startdata: "",
-                    starttime:"00:00:00",
-                    endtime:"23:59:59",
+                    starttime: "00:00:00",
+                    endtime: "23:59:59",
                     reductiontime: "", // 减免时长
                     reductionmoney: "",// 减免金额
                 };
@@ -324,7 +347,7 @@
                 // 开始时间
                 if (this.addForm.startdata === undefined || this.addForm.startdata === '') {
                     this.addForm.startdata = this.rowtime.starttime;
-                }else {
+                } else {
                     var datetime = new Date(this.addForm.startdata);
                     var y1 = datetime.getFullYear() + "-";
                     var mon1 = datetime.getMonth() + 1 + "-";
@@ -356,52 +379,122 @@
                 }
                 var res = this;
                 var setData = this.addForm;
-                var StartTime = new Date(this.rowtime.starttime).getTime();
-                var EndTime = new Date(this.rowtime.endtime).getTime();
-                var EndData= new Date(setData.startdata).getTime();
-                var StartData= new Date(setData.enddata).getTime();
+                var StartTime = new Date(this.rowtime.starttime);
+                var EndTime = new Date(this.rowtime.endtime);
+                var EndData = new Date(setData.startdata);
+                var StartData = new Date(setData.enddata);
+                console.log(this.rowtime.endtime);
+                console.log(setData.enddata);
+                console.log(EndTime>=EndData);
+                console.log(EndTime);
+                console.log(EndData);
                 if (EndTime >= EndData && StartTime <= StartData) {
                     if (this.names === "减免金额") {
-                        //todo
+                        console.log(this.remaincount);
+                        var addservered = Number(this.addForm.count) * Number(this.addForm.reductionmoney);
+                        if (addservered > Number(this.remaincount)) {
+                            this.addserver = "总金额不能大于剩余金额";
+                        } else {
+                            this.$axios({
+                                url:
+                                    this.GLOBAL._SERVER_API_ + "shopCouponManager/save",
+                                method: "post",
+                                data: setData
+                            })
+                                .then(function (response) {
+                                    if (response.data.status === 200) {
+                                        res.editVisibleCoupon = false;
+                                        res.$message.success("生成优惠券成功");
+                                        res.addserver = "";
+                                        if (res.tableData[res.idx].id === res.id) {
+                                            res.$set(res.tableData, res.idx, res.addForm);
+                                        } else {
+                                            for (let i = 0; i < res.tableData.length; i++) {
+                                                if (res.tableData[i].id === res.id) {
+                                                    res.$set(res.tableData, i, res.addForm);
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                        res.getData();
+                                    }
+                                })
+                                .catch(function (error) {
+                                    res.$message.error("生成优惠券失败！");
+                                    console.log(error);
+                                });
+                        }
                     } else if (this.nameS === "减免时长") {
-                        //todo
+                        var addservertime = Number(this.addForm.count) * Number(this.addForm.reductiontime)
+                        console.log(this.Alltime)
+                        if (addservertime > Number(this.remaincount)) {
+                            this.addserver = "总时长不能大于剩余时长"
+                        } else {
+                            this.$axios({
+                                url:
+                                    this.GLOBAL._SERVER_API_ + "shopCouponManager/save",
+                                method: "post",
+                                data: setData
+                            })
+
+                                .then(function (response) {
+                                    if (response.data.status === 200) {
+                                        res.editVisibleCoupon = false;
+                                        res.$message.success("生成优惠券成功");
+                                        res.addserver = ""
+                                        if (res.tableData[res.idx].id === res.id) {
+                                            res.$set(res.tableData, res.idx, res.addForm);
+                                        } else {
+                                            for (let i = 0; i < res.tableData.length; i++) {
+                                                if (res.tableData[i].id === res.id) {
+                                                    res.$set(res.tableData, i, res.addForm);
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                        res.getData();
+                                    }
+                                })
+                                .catch(function (error) {
+                                    res.$message.error("生成优惠券失败！");
+                                    console.log(error);
+                                });
+                        }
                     } else {
-                        //todo
                         if (Number(this.addForm.count) > Number(this.remaincount)) {
                             this.addserver = "数量不能大于减免券剩余量"
                         } else {
-                            //todo
+                            this.$axios({
+                                url:
+                                    this.GLOBAL._SERVER_API_ + "shopCouponManager/save",
+                                method: "post",
+                                data: setData
+                            })
+
+                                .then(function (response) {
+                                    if (response.status === 200) {
+                                        res.editVisibleCoupon = false;
+                                        res.$message.success("生成优惠券成功");
+                                        res.addserver = ""
+                                        console.log("123", response);
+                                        if (res.tableData[res.idx].id === res.id) {
+                                            res.$set(res.tableData, res.idx, res.addForm);
+                                        } else {
+                                            for (let i = 0; i < res.tableData.length; i++) {
+                                                if (res.tableData[i].id === res.id) {
+                                                    res.$set(res.tableData, i, res.addForm);
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                        res.getData();
+                                    }
+                                })
+                                .catch(function (error) {
+                                    res.$message.error("生成优惠券失败！");
+                                    console.log(error);
+                                });
                         }
-                        //     this.$axios({
-                        //         url:
-                        //             "http://yun.jinshipark.com:81/shopCouponManager/updateCouponCount",
-                        //         method: "post",
-                        //         data: setData
-                        //     })
-                        //         .then(function (response) {
-                        //             if (response.status <= 200) {
-                        //                 res.editVisibleCoupon = false;
-                        //                 res.$message.success("生成优惠券成功");
-                        //                 res.addserver = ""
-                        //                 console.log("123", response);
-                        //                 if (res.tableData[res.idx].id === res.id) {
-                        //                     res.$set(res.tableData, res.idx, res.editForm);
-                        //                 } else {
-                        //                     for (let i = 0; i < res.tableData.length; i++) {
-                        //                         if (res.tableData[i].id === res.id) {
-                        //                             res.$set(res.tableData, i, res.editForm);
-                        //                             return;
-                        //                         }
-                        //                     }
-                        //                 }
-                        //                 res.getData();
-                        //             }
-                        //         })
-                        //         .catch(function (error) {
-                        //             res.$message.error("修改失败！");
-                        //             console.log(error);
-                        //         });
-                        // }
                     }
 
                 } else {
@@ -411,7 +504,33 @@
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
-            }
+            },
+            dateFormatterexpirationTime(row, column) {
+                let datetime = row.endtime;
+                if (datetime) {
+                    datetime = new Date(datetime);
+                    let y = datetime.getFullYear() + "-";
+                    let mon = datetime.getMonth() + 1 + "-";
+                    let d = datetime.getDate();
+                    if(datetime.getHours()===0){
+                        var h = '23:';
+                    }else {
+                        var h = datetime.getHours() + ':';
+                    }
+                    if(datetime.getMinutes()===0){
+                        var m = '59:';
+                    }else {
+                        var m = datetime.getMinutes() + ':';
+                    }
+                    if(datetime.getSeconds()===0){
+                        var s = '59';
+                    }else {
+                        var s = datetime.getSeconds();
+                    }
+                    return y + mon + d + " " + h + m + s;
+                }
+                return "";
+            },
         }
     };
 </script>

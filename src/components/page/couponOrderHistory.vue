@@ -476,7 +476,7 @@ export default {
          var h = datetime.getHours() + ':';
         var m = datetime.getMinutes() + ':';
         var s = datetime.getSeconds();
-        return y + mon + d+" "+h+m+s;saveAdd
+        return y + mon + d+" "+h+m+s;
       }
       return "";
     },
