@@ -1,5 +1,5 @@
 <script>
-const _SERVER_API_ = "http://192.168.31.217:8090/yhq/";
+const _SERVER_API_ = "http://47.103.155.55:8080/yhq-war/";
 const _REQUEST_TIME_OUT_ = 30000; // 10秒
 export default {
 	_SERVER_API_, // 后台服务器地址
