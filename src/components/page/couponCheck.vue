@@ -283,7 +283,7 @@
                 } else {
                     this.addent = true;
                     // 优惠券二维码
-                    this.link = "http://yhq2.jinshipark.com:8080/yhq-static/addPlote.html?id=" + row.id + "&type=" + row.type + "&strSign=" + '6214A0' + "&strOrderID=" + "022020080415084601109";
+                    this.link = "http://syq.jinshipark.com/addPlote.html?id=" + row.id + "&type=" + row.type + "&strSign=" + '6214A0' + "&strOrderID=" + "022020080415084601109";
                     document.getElementById("qrcode").innerHTML = "";
                     this.$nextTick(function () {
                         //生成二维码
