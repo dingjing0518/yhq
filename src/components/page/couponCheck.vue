@@ -276,14 +276,14 @@
                 var DateTime = new Date();
                 var TimeDate1 = DateTime.getTime();
                 var TimeDate = DateTime.getTime();
-                console.log(TimeDate)
-                console.log(TimeDate1)
+                console.log(TimeDate);
+                console.log(TimeDate1);
                 if (time1 > time2) {
                     this.$message.error("二维码已过期");
                 } else {
                     this.addent = true;
                     // 优惠券二维码
-                    this.link = "http://syq.jinshipark.com/addPlote.html?id=" + row.id + "&type=" + row.type + "&strSign=" + '6214A0' + "&strOrderID=" + "022020080415084601109";
+                    this.link = "http://syq.jinshipark.com/addPlote.html?id=" + row.id + "&type=" + row.type;
                     document.getElementById("qrcode").innerHTML = "";
                     this.$nextTick(function () {
                         //生成二维码

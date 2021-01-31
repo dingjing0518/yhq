@@ -289,7 +289,7 @@
                             }
                             for (let i = 0; i < res.tableData.length; i++) {
                                 var DateTime = new Date();
-                                var endtime = new Date(tableData[i].endtime);
+                                var endtime = new Date(res.tableData[i].endtime);
                                 if (DateTime.getTime() > endtime.getTime()) {
                                     res.tableData[i].isShow = false;
                                 }else {
