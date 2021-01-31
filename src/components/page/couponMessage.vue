@@ -16,15 +16,15 @@
                 <el-table-column prop="names" label="优惠券类型" class-name="table"></el-table-column>
                 <el-table-column prop="couponname" label="减免券名称" class-name="table"></el-table-column>
                 <el-table-column prop="starttime" label="开始日期" class-name="table"></el-table-column>
-                <el-table-column prop="endtime" label="结束日期"   class-name="table" ></el-table-column>
+                <el-table-column prop="endtime" label="结束日期" class-name="table"></el-table-column>
                 <el-table-column prop="count" label="减免券总数量" class-name="table"></el-table-column>
                 <el-table-column prop="remaincount" label="减免券剩余量" class-name="table"></el-table-column>
                 <!--                <el-table-column prop="jcgReliefAlltime" label="减免时长" class-name="table"></el-table-column>-->
                 <!--                <el-table-column prop="jcgReliefAllmoney" label="减免金额" class-name="table"></el-table-column>-->
                 <el-table-column label="操作" width="180" align="center" class-name="table">
                     <template slot-scope="scope">
-<!--                        <el-button type="text" v-show="scope.row.isShow" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">生成-->
-<!--                        </el-button>-->
+                        <!--                        <el-button type="text" v-show="scope.row.isShow" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">生成-->
+                        <!--                        </el-button>-->
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">生成
                         </el-button>
                     </template>
@@ -172,6 +172,7 @@
                     parkid: "",
                     couponId: "",
                     agentid: "",
+                    areaname: "",
                     reductiontime: "", // 减免时长
                     reductionmoney: ""// 减免金额
                 },
@@ -292,7 +293,7 @@
                                 var endtime = new Date(res.tableData[i].endtime);
                                 if (DateTime.getTime() > endtime.getTime()) {
                                     res.tableData[i].isShow = false;
-                                }else {
+                                } else {
                                     res.tableData[i].isShow = true;
                                 }
                             }
@@ -334,6 +335,7 @@
                     areaid: row.areaid,
                     shopid: row.shopid,
                     parkid: row.parkid,
+                    areaname: row.areaname,
                     startdata: "",
                     starttime: "00:00:00",
                     endtime: "23:59:59",
@@ -385,7 +387,7 @@
                 var StartData = new Date(setData.enddata);
                 console.log(this.rowtime.endtime);
                 console.log(setData.enddata);
-                console.log(EndTime>=EndData);
+                console.log(EndTime >= EndData);
                 console.log(EndTime);
                 console.log(EndData);
                 if (EndTime >= EndData && StartTime <= StartData) {
@@ -512,19 +514,19 @@
                     let y = datetime.getFullYear() + "-";
                     let mon = datetime.getMonth() + 1 + "-";
                     let d = datetime.getDate();
-                    if(datetime.getHours()===0){
+                    if (datetime.getHours() === 0) {
                         var h = '23:';
-                    }else {
+                    } else {
                         var h = datetime.getHours() + ':';
                     }
-                    if(datetime.getMinutes()===0){
+                    if (datetime.getMinutes() === 0) {
                         var m = '59:';
-                    }else {
+                    } else {
                         var m = datetime.getMinutes() + ':';
                     }
-                    if(datetime.getSeconds()===0){
+                    if (datetime.getSeconds() === 0) {
                         var s = '59';
-                    }else {
+                    } else {
                         var s = datetime.getSeconds();
                     }
                     return y + mon + d + " " + h + m + s;
