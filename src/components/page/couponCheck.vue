@@ -182,14 +182,14 @@
             //删除功能
             handleDelete(index, row) {
                 this.idx = index;
-                this.id = row.jcgId;
+                this.id = row.id;
                 console.log(row);
                 this.delVisible = true;
             },
             // 返还功能
             handleRevert(index, row) {
-                console.log(row)
-                this.revertId = Number(row.jcgId);
+                console.log(row);
+                this.revertId = Number(row.id);
                 this.revertVisible = true;
 
             },
@@ -198,15 +198,16 @@
                 var res = this;
                 console.log(res.id);
                 this.$axios({
-                    url:
-                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/deleteByPrimaryKey",
+                    url: this.GLOBAL._SERVER_API_ + "couponManager/deleteByPrimaryKey",
                     method: "post",
                     data: {id: res.id}
                 })
                     .then(function (response) {
-                        if (response.status <= 200) {
+                        if (response.data.status === 500) {
+                            res.$message.error("删除失败: " + response.data.msg);
+                        } else {
                             res.$message.success("删除成功");
-                            res.delVisible = false;
+
                             if (res.tableData[res.idx].id === res.id) {
                                 res.tableData.splice(res.idx, 1);
                             } else {
@@ -217,8 +218,9 @@
                                     }
                                 }
                             }
-                            res.getData();
                         }
+                        res.delVisible = false;
+                        res.getData();
                     })
                     .catch(function (error) {
                         res.$message.error("删除失败！");
@@ -230,22 +232,23 @@
                 var res = this;
                 console.log(res.revertId);
                 this.$axios({
-                    url:
-                        "http://yun.jinshipark.com:81/JinshiCouponGenerate/returnBack",
+                    url: this.GLOBAL._SERVER_API_ + "couponManager/returnBack",
                     method: "post",
-                    data: JSON.stringify({jcgId: res.revertId}),
+                    data: JSON.stringify({id: res.revertId}),
                     headers: {'Content-Type': 'application/json'},
                 })
                     .then(function (response) {
-
-                        res.$message.success("返还成功");
+                        if (response.data.status === 500) {
+                            res.$message.error("返还失败: " + response.data.msg);
+                        } else {
+                            res.$message.success("返还成功");
+                        }
                         res.revertVisible = false;
-
                         res.getData();
 
                     })
                     .catch(function (error) {
-                        res.$message.error("返还失败！");
+                        res.$message.error("返还失败");
                         console.log(error);
                     });
             },

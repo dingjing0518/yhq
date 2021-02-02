@@ -8,6 +8,9 @@
             </el-breadcrumb>
         </div>
         <div class="container">
+            <div class="handle-box">
+                <el-button type="primary" icon="el-icon-search" @click="refresh" class="sousuo">刷新</el-button>
+            </div>
             <el-table :data="tableData" border class="table" ref="multipleTable"
                       @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" align="center" class-name="table"></el-table-column>
@@ -258,7 +261,10 @@
             }
         },
         methods: {
-
+            //刷新
+            refresh() {
+                this.getData();
+            },
             // 获取数据
             getData() {
                 var res = this;
