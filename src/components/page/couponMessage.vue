@@ -306,6 +306,7 @@
             },
             //生成
             handleEdit(index, row) {
+                this.addserver = '';
                 this.rowtime = row;
                 this.names = row.names;//优惠券类型名称
                 this.remaincount = row.remaincount;//剩余优惠券数量
@@ -399,7 +400,7 @@
                         } else {
                             this.$axios({
                                 url:
-                                    this.GLOBAL._SERVER_API_ + "shopCouponManager/save",
+                                    this.GLOBAL._SERVER_API_ + "couponManager/save",
                                 method: "post",
                                 data: setData
                             })
@@ -426,15 +427,16 @@
                                     console.log(error);
                                 });
                         }
-                    } else if (this.nameS === "减免时长") {
-                        var addservertime = Number(this.addForm.count) * Number(this.addForm.reductiontime)
-                        console.log(this.Alltime)
+                    } else if (this.names === "减免时长") {
+                        var addservertime = Number(this.addForm.count) * Number(this.addForm.reductiontime);
+                        console.log(addservertime);
+                        console.log(this.remaincount);
                         if (addservertime > Number(this.remaincount)) {
                             this.addserver = "总时长不能大于剩余时长"
                         } else {
                             this.$axios({
                                 url:
-                                    this.GLOBAL._SERVER_API_ + "shopCouponManager/save",
+                                    this.GLOBAL._SERVER_API_ + "couponManager/save",
                                 method: "post",
                                 data: setData
                             })
@@ -468,7 +470,7 @@
                         } else {
                             this.$axios({
                                 url:
-                                    this.GLOBAL._SERVER_API_ + "shopCouponManager/save",
+                                    this.GLOBAL._SERVER_API_ + "couponManager/save",
                                 method: "post",
                                 data: setData
                             })

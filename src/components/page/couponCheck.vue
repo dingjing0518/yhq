@@ -352,7 +352,6 @@
 
             //续费
             handleadd(index, row) {
-                console.log(row);
                 this.posinType = row;
                 this.idx = index;
                 this.id = row.id;
@@ -370,13 +369,12 @@
                     this.typenames = "请输入续费的当天全免劵";
                     this.point = "输入的减免劵数量不能大于已有减免卷";
                 }
-                //todo
                 var date = new Date();
                 var date2 = new Date(row.enddate);
                 var time1 = date.getTime();
                 var time2 = date2.getTime();
                 if (time1 > time2) {
-                    this.$message.error("优惠券已过期");
+                    this.$message.error("生成的优惠券已过期");
                 } else {
                     var id = row.id;
                     var type = Number(row.type);
@@ -386,122 +384,39 @@
                         id: id,
                         count: "",
                         reductiontime: "",
-                        reductionmoney: "",
-                        // jcgCount: ""
+                        reductionmoney: ""
                     };
-                    // this.addnewForm.jcgId = idd;
                     this.addnewVisible = true;
                     this.remaincount = row.remaincount;
                 }
             },
 
             addSure() {
-                console.log(this.posinType);
-                if (this.posinType.type == 1) {
-                    //todo
-                } else if (this.posinType.type == 2) {
-                    //todo
-                } else {
-                    this.addnewForm.count = Number(this.addnewForm.count);
-                    this.addnewForm.reductiontime = "";
-                    this.addnewForm.reductionmoney = "";
-                }
                 this.addnewForm.count = Number(this.addnewForm.count);
-                this.addnewForm.reductionmoney = String(
-                    this.addnewForm.reductionmoney
-                );
-                this.addnewForm.reductiontime = String(
-                    this.addnewForm.reductiontime
-                );
                 var res = this;
                 var setData = this.addnewForm;
                 if (res.addnewForm.count !== "") {
-                    if (res.posinType.type === 1) {
-                        // console.log(res.posinType);
-                        // console.log(res.addnewForm.jcgCount);
-                        //
-                        // if (
-                        //     res.posinType.jinshijcgReliefRemaintime <
-                        //     Number(res.addnewForm.jcgCount) *
-                        //     Number(res.posinType.jcgReliefTime)
-                        // ) {
-                        //     res.pointNames = "您所剩减免时长没有这么多";
-                        // } else {
-                        //     console.log(this.addnewForm, "1111111111111111111111111111111111");
-                        //     res.addnewForm.jcgReliefAllmoney = String(
-                        //         res.addnewForm.jcgReliefAllmoney
-                        //     );
-                        //     this.$axios({
-                        //         url:
-                        //             "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateJcgCount",
-                        //         method: "post",
-                        //         data: setData
-                        //     })
-                        //         .then(function (response) {
-                        //             res.pointNames = "";
-                        //             res.addnewForm.jcgCount = "";
-                        //             res.hidden = false;
-                        //             res.$message.success("充值成功");
-                        //             res.addnewVisible = false;
-                        //             res.getData();
-                        //             console.log("123");
-                        //         })
-                        //         .catch(function (err) {
-                        //             res.$message.error("充值失败: " + error);
-                        //         });
-                        // }
-                    } else if (res.posinType.type == 2) {
-                        // if (
-                        //     res.posinType.jinshijcgReliefRemainmoney <
-                        //     Number(res.addnewForm.jcgCount) *
-                        //     Number(res.posinType.jcgReliefMoney)
-                        // ) {
-                        //     res.pointNames = "您所剩减免金额没有这么多";
-                        // } else {
-                        //     this.$axios({
-                        //         url:
-                        //             "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateJcgCount",
-                        //         method: "post",
-                        //         data: setData
-                        //     })
-                        //         .then(function (response) {
-                        //             res.pointNames = "";
-                        //             res.addnewForm.jcgCount = "";
-                        //             res.hidden = false;
-                        //             res.$message.success("充值成功");
-                        //             res.addnewVisible = false;
-                        //             res.getData();
-                        //             console.log("123");
-                        //         })
-                        //         .catch(function (error) {
-                        //             // res.$message.error("充值失败: " + error);
-                        //         });
-                        // }
-                    } else {
-                        if (
-                            res.posinType.remaincount < Number(res.addnewForm.count)
-                        ) {
-                            res.pointNames = "您所剩减免优惠券没有这么多";
-                        } else {
-                            // this.$axios({
-                            //     url:
-                            //         "http://yun.jinshipark.com:81/JinshiCouponGenerate/updateJcgCount",
-                            //     method: "post",
-                            //     data: setData
-                            // })
-                            //     .then(function (response) {
-                            //         res.pointNames = "";
-                            //         res.addnewForm.count = "";
-                            //         res.hidden = false;
-                            //         res.$message.success("充值成功");
-                            //         res.addnewVisible = false;
-                            //         res.getData();
-                            //     })
-                            //     .catch(function (err) {
-                            //         res.$message.error("充值失败: " + error);
-                            //     });
-                        }
-                    }
+                    this.$axios({
+                        url: this.GLOBAL._SERVER_API_ + "couponManager/updateCoupon",
+                        method: "post",
+                        data: setData
+                    })
+                        .then(function (response) {
+                            console.log(response);
+                            if (response.data.status === 500) {
+                                res.$message.error("充值失败: " + response.data.msg);
+                            } else {
+                                res.$message.success("充值成功");
+                            }
+                            res.pointNames = "";
+                            res.addnewForm.count = "";
+                            res.hidden = false;
+                            res.addnewVisible = false;
+                            res.getData();
+                        })
+                        .catch(function (err) {
+                            res.$message.error("充值失败: " + error);
+                        });
                 } else {
                     this.hidden = true;
                 }
@@ -563,7 +478,7 @@
             getData() {
                 var res = this;
                 this.$axios({
-                    url: this.GLOBAL._SERVER_API_ + "shopCouponManager/list",
+                    url: this.GLOBAL._SERVER_API_ + "couponManager/list",
                     method: "post",
                     data: {
                         shopid: parseInt(localStorage.getItem("shopid")),
@@ -606,7 +521,8 @@
                                 }
                             }
                             res.tableData = response.data.data;
-                        };
+                        }
+                        ;
                     })
                     .catch(function (error) {
                         res.$message.error("查询失败: " + error);
