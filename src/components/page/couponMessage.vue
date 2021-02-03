@@ -64,11 +64,11 @@
 
                 <el-form-item label="开始日期" prop="startdata">
                     <el-date-picker type="datetime" v-model="addForm.startdata"
-                                    placeholder="生效时间，默认无失效日期"></el-date-picker>
+                                    placeholder="生效时间，默认无失效日期" ></el-date-picker>
                 </el-form-item>
                 <el-form-item label="结束日期" prop="enddata">
                     <el-date-picker type="datetime" v-model="addForm.enddata"
-                                    placeholder="生效时间，默认无失效日期"></el-date-picker>
+                                    placeholder="生效时间，默认无失效日期" default-time="23:59:59"></el-date-picker>
                 </el-form-item>
                 <el-form-item label="开始时间" prop="starttime">
                     <el-time-picker v-model="addForm.starttime" value-format='HH:mm:ss'
