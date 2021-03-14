@@ -3,7 +3,7 @@
     <div class="crumbs">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>
-          <i class="el-icon-lx-cascades"></i> 优惠券订单
+          <i class="el-icon-lx-cascades"></i> 在场优惠券订单
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
@@ -13,15 +13,15 @@
        
           <el-date-picker
               v-model="valuetime"
-              type="date"
-              placeholder="选择日期">
+              type="datetime"
+              placeholder="选择日期" default-time="00:00:00">
           </el-date-picker>
        
           <el-date-picker
            style="margin:0px 10px 0px 10px"
               v-model="valuetimeA"
-              type="date"
-              placeholder="选择日期">
+              type="datetime"
+              placeholder="选择日期" default-time="23:59:59">
           </el-date-picker>
        
 
@@ -42,8 +42,8 @@
         <el-table-column prop="jcoType" label="类型" class-name="table"></el-table-column>
         <el-table-column prop="jcoCarColor" label="颜色" class-name="table"></el-table-column>
         <el-table-column prop="jcoCarType" label="车类型" class-name="table"></el-table-column>-->
-        <el-table-column prop="intime" label="进场时间" :formatter="dateFormatter" class-name="table"></el-table-column>
-        <el-table-column prop="outtime" label="出场时间" :formatter="dateFormatterexpirationTime" class-name="table"></el-table-column>
+        <el-table-column prop="intime" label="进场时间" class-name="table"></el-table-column>
+        <el-table-column prop="outtime" label="出场时间" class-name="table"></el-table-column>
         <el-table-column prop="parktime" label="停车时间" class-name="table"></el-table-column>
         <el-table-column prop="actualTime" label="实际支付时间" class-name="table"></el-table-column>
         <el-table-column prop="jcoParkingName" label="车场名称" class-name="table"></el-table-column>
@@ -152,14 +152,9 @@ export default {
     };
   },
   created() {
-    var data=new Date()
-    this.valuetimeA=data
-     this.valuetime=data
+    this.valuetime = this.startDateFormatString(new Date());
+    this.valuetimeA = this.endDateFormatString(new Date());
     this.getData();
-    // this.getAgent();
-    // this.getArea();
-    // this.getParking();
-    // this.getCoupon();
   },
   computed: {
     data() {
@@ -186,40 +181,14 @@ export default {
   methods: {
     //搜索
     search(value) {
-      
-      var date = new Date(this.valuetime);
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
-        var day = date.getDate();
-        if (month < 10) {
-            month = "0" + month;
-        }
-        if (day < 10) {
-            day = "0" + day;
-        }
-      var nowDate = year + "-" + month + "-" + day;
-      this.valuetime=nowDate;
-
-      var date = new Date(this.valuetimeA);
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
-        var day = date.getDate();
-        if (month < 10) {
-            month = "0" + month;
-        }
-        if (day < 10) {
-            day = "0" + day;
-        }
-      var nowDateA = year + "-" + month + "-" + day;
-      this.valuetimeA=nowDateA;
-
-
+      this.valuetime = this.dateFormatterString(new Date(this.valuetime));
+      this.valuetimeA = this.dateFormatterString(new Date(this.valuetimeA));
       this.numberer = 1;
-      if (value == 1) {
+      if (value === 1) {
         this.cur_page = 1;
       }
       this.is_search = true;
-      var res = this;
+      let res = this;
       // 搜索
       this.$axios({
         url: this.GLOBAL._SERVER_API_ +"couponOrderManager/searchCouponOrder",
@@ -230,7 +199,8 @@ export default {
           pageSize: res.pagesize,
           startTime:res.valuetime, 
           endTime:res.valuetimeA,
-          shopId : Number(localStorage.getItem("shopid"))
+          shopId : Number(localStorage.getItem("shopid")),
+          parkId: Number(localStorage.getItem("parkingId"))
         }
       })
         .then(function(response) {
@@ -258,9 +228,6 @@ export default {
           res.$message.error("查询失败: " + error);
           console.log(error);
         });
-        this.getParking()
-      this.getArea()
-        
     },
     dateFormatterexpirationTime(row, column) {
       let datetime = row.outtime;
@@ -311,19 +278,50 @@ export default {
         this.search(2);
       }
     },
+    startDateFormatString(date) {
+      var year = date.getFullYear();
+      var month = date.getMonth() + 1;
+      var day = date.getDate();
+      if (month < 10) {
+        month = "0" + month;
+      }
+      if (day < 10) {
+        day = "0" + day;
+      }
+      return year + "-" + month + "-" + day + " 00:00:00";
+    },
+    endDateFormatString(date) {
+      var year = date.getFullYear();
+      var month = date.getMonth() + 1;
+      var day = date.getDate();
+      if (month < 10) {
+        month = "0" + month;
+      }
+      if (day < 10) {
+        day = "0" + day;
+      }
+      return year + "-" + month + "-" + day + " 23:59:59";
+    },
+    dateFormatterString(date) {
+      let y = date.getFullYear();
+      let mon = date.getMonth() + 1;
+      let d = date.getDate();
+      let h = date.getHours();
+      var m = date.getMinutes();
+      var s = date.getSeconds();
+      mon = mon < 10 ? '0' + mon : mon;
+      d = d < 10 ? '0' + d : d;
+      h = h < 10 ? "0" + h : h;
+      m = m < 10 ? "0" + m : m;
+      s = s < 10 ? "0" + s : s;
+      return y + '-' + mon + '-' + d + " " + h + ':' + m + ':' + s;
+    },
     // 获取数据
     getData() {
       this.numberer = 0;
-      var res = this;
-      var dataTime = new Date()
-      console.log(dataTime)
-      var Y = dataTime.getFullYear() + '-';
-      var M = (dataTime.getMonth() + 1 < 10 ? '0' + (dataTime.getMonth() + 1) : dataTime.getMonth() + 1) + '-';
-      var D = dataTime.getDate();
-    
-      var timeStart= Y + M + D;
-      var timeEnd = Y + M + D;
-      console.log(timeStart,timeEnd)
+      let res = this;
+      let timeStart = this.startDateFormatString(new Date());
+      let timeEnd = this.endDateFormatString(new Date());
        this.$axios({
         url: this.GLOBAL._SERVER_API_ +"couponOrderManager/searchCouponOrder",
         method: "post",
@@ -333,7 +331,8 @@ export default {
           pageSize: res.pagesize,
           startTime:timeStart, 
           endTime:timeEnd,
-          shopId : Number(localStorage.getItem("shopid"))
+          shopId : Number(localStorage.getItem("shopid")),
+          parkId: Number(localStorage.getItem("parkingId"))
         }
       })
         .then(function(response) {

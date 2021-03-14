@@ -51,7 +51,7 @@
 					{
 					    icon: 'el-icon-lx-cascades',
 					    index: 'couponOrder',
-					    title: '优惠券订单'
+					    title: '在场优惠券订单'
                     },
                     {
                         icon: 'el-icon-lx-cascades',
