@@ -3,6 +3,11 @@
         <div class="ms-login">
             <div class="ms-title">金石停车 商户平台</div>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="ms-content">
+                <el-form-item prop="parkName">
+                    <el-input v-model="ruleForm.parkName" placeholder="车场名称" @blur="bur">
+                        <!-- <el-button slot="prepend" icon="el-icon-lx-people"></el-button> -->
+                    </el-input>
+                </el-form-item>
                 <el-form-item prop="loginName">
                     <el-input v-model="ruleForm.loginName" placeholder="loginName" @blur="bur">
                         <!-- <el-button slot="prepend" icon="el-icon-lx-people"></el-button> -->
@@ -14,6 +19,9 @@
                         <!-- <el-button slot="prepend" icon="el-icon-lx-lock"></el-button> -->
                     </el-input>
                 </el-form-item>
+                <div class="verify-slider">
+                    <VerifySlider ref="VerifySlider" @success="successHandler"/>
+                </div>
                 <div class="login-btn">
                     <el-button type="primary" @click="userMessage()">登录</el-button>
                 </div>
@@ -41,11 +49,17 @@
                 checked: "",
                 checkeders: '',
                 applyGood: [],
+                verify: false,
                 ruleForm: {
                     loginName: '',
                     password: ''
                 },
                 rules: {
+                    parkName: [{
+                        required: true,
+                        message: '请输入车场名称',
+                        trigger: 'blur'
+                    }],
                     loginName: [{
                         required: true,
                         message: '请输入用户名',
@@ -71,12 +85,16 @@
             } else {
                 this.checked = false
             }
-            this.ruleForm.loginName = window.localStorage.getItem("checkedersid")
+            this.ruleForm.loginName = window.localStorage.getItem("checkedersid");
+            this.ruleForm.parkName = window.localStorage.getItem("parkName");
             if (this.ruleForm.loginName != null) {
                 this.bur()
             }
         },
         methods: {
+            successHandler() {
+                this.verify = true;
+            },
             bur() {
                 var flag = false;
                 var nde = JSON.parse(window.localStorage.getItem('applyParams'));
@@ -85,7 +103,7 @@
                     return;
                 }
                 for (var i = 0; i < nde.length; i++) {
-                    if (this.ruleForm.loginName == nde[i].loginName) {
+                    if (this.ruleForm.parkName == nde[i].parkName && this.ruleForm.loginName == nde[i].loginName) {
                         this.ruleForm.password = nde[i].password;
                         this.checked = true;
                         this.checkeders = true;
@@ -98,22 +116,30 @@
 
             },
             userMessage(formName) {
-                var res = this
+                if (!this.verify) {
+                    alert("滑动验证未通过");
+                    return;
+                }
+                let res = this;
                 this.$axios({
-                    url: this.GLOBAL._SERVER_API_ + 'user/login?loginName=' + res.ruleForm.loginName + '&password=' + md5(res.ruleForm.password).toUpperCase(),
-                    method: 'get'
+                    url: this.GLOBAL._SERVER_API_ + 'user/login',
+                    method: 'post',
+                    data: {
+                        parkName: res.ruleForm.parkName,
+                        loginName: res.ruleForm.loginName,
+                        password: md5(res.ruleForm.password).toUpperCase()
+                    }
                 }).then(function (response) {
                     if (response.data.status == 200) {
-                        console.log(response)
+                        console.log(response);
                         localStorage.setItem('ms_loginName', res.ruleForm.loginName);
-                        console.log(response.data.data.id);
                         localStorage.setItem('userId', response.data.data.id);
                         localStorage.setItem('agentId', response.data.data.agentid);
                         localStorage.setItem('shopid', response.data.data.shopid);
                         localStorage.setItem('areaId', response.data.data.areaid);
                         localStorage.setItem('parkingId', response.data.data.parkid);
-                        console.log(res.ruleForm.password)
-                        localStorage.setItem("password", res.ruleForm.password)
+                        localStorage.setItem("password", res.ruleForm.password);
+                        localStorage.setItem("parkName", res.ruleForm.parkName);
                         if (res.checked == true) {
                             var flag = false;
                             localStorage.setItem('cd', true);
@@ -121,14 +147,15 @@
 
                                 res.applyGood = JSON.parse(window.localStorage.getItem('applyParams'));
                                 for (var i = 0; i < res.applyGood.length; i++) {
-                                    if (res.ruleForm.loginName === res.applyGood[i].loginName) {
+                                    if (res.ruleForm.parkName === res.applyGood[i].parkName && res.ruleForm.loginName === res.applyGood[i].loginName) {
                                         flag = true;
                                     }
                                 }
 
                             }
-                            if(!flag){
+                            if (!flag) {
                                 res.applyGood.push({
+                                    parkName: res.ruleForm.parkName,
                                     loginName: res.ruleForm.loginName,
                                     password: res.ruleForm.password,
                                 })
@@ -154,6 +181,7 @@
                     res.$message.error('系统错误: ' + error);
                     console.log(error);
                 });
+                this.$refs.VerifySlider.init();
             }
         }
     }
@@ -205,6 +233,7 @@
     }
 
     .login-btn {
+        margin-top: 15px;
         text-align: center;
     }
 

@@ -21,6 +21,8 @@ Vue.use(ElementUI, {
     size: 'small'
 });
 
+import VerifySlider from 'vue-verify-slider'
+Vue.use(VerifySlider);
 
 //全局过滤器 testgitabc
 Vue.filter('dateFmt', (input, formatString = "YYYY-MM-DD") => {

@@ -33,6 +33,7 @@
                     <template slot-scope="scope">
                         <el-button type="text" class="red" @click="look(scope.$index, scope.row)">查看二维码</el-button>
                         <el-button type="text" class="red" @click="handleadd(scope.$index, scope.row)">续费</el-button>
+                        <el-button type="text" class="red" @click="handleDelay(scope.$index, scope.row)">延期</el-button>
                         <el-button type="text" class="red" @click="handleRevert(scope.$index, scope.row)">返还</el-button>
                         <el-button type="text" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
@@ -52,6 +53,29 @@
         <el-button @click="addnewVisible = false">取 消</el-button>
         <el-button type="primary" @click="addSure">确 定</el-button>
       </span>
+        </el-dialog>
+        <!-- 延期弹出框 -->
+        <el-dialog title="优惠券延期" :visible.sync="delayVisible" width="30%">
+            <el-form :model="delayForm" label-width="100px">
+                <el-form-item label="优惠券名称" prop="name">
+                    <el-input v-model="delayForm.name" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="优惠券类型" prop="names">
+                    <el-input v-model="delayForm.names" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="开始日期" prop="startdate">
+                    <el-date-picker type="datetime" v-model="delayForm.startdate" :disabled="true"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="延期至" prop="enddate">
+                    <el-date-picker type="datetime" v-model="delayForm.enddate"
+                                    default-time="23:59:59"></el-date-picker>
+                </el-form-item>
+            </el-form>
+            <span class="span_addserver" v-if="addserver!=''">{{addserver}}</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="delayVisible = false">取 消</el-button>
+                <el-button type="primary" @click="delay()">确 定</el-button>
+              </span>
         </el-dialog>
         <!-- 删除提示框 -->
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
@@ -103,6 +127,7 @@
             return {
                 countdown: 5,
                 payTimeout: "5秒 后失效",
+                ShopCouponEndTime: '',
                 addent: false,
                 link: "", //需要生成二维码图片的字符串
                 qrCodeSize: "50",
@@ -113,8 +138,11 @@
                 key: true,
                 tableData: [],
                 delVisible: false,
+                delayVisible: false,
                 revertVisible: false,
+                Visible: false,
                 cur_page: 1,
+                addserver: '',
                 pagesize: 20,
                 typenames: "",
                 point: "",
@@ -144,6 +172,15 @@
                 addnewForm: {
                     id: "",
                     count: ""
+                },
+                delayForm: {
+                    id:'',
+                    couponId:'',
+                    name: '',
+                    names: '',
+                    remaincount: '',
+                    startdate: '',
+                    enddate: ''
                 }
             };
         },
@@ -393,7 +430,36 @@
                     this.remaincount = row.remaincount;
                 }
             },
+            // 延期功能
+            handleDelay(index, row) {
+                this.addserver = '';
+                console.log(row);
+                this.delayForm = {
+                    id:row.id,
+                    couponId:row.couponid,
+                    name: row.name,
+                    names: row.names,
+                    remaincount: row.remaincount,
+                    startdate: row.startdate,
+                    enddate: ""
+                };
+                this.delayVisible = true;
 
+            },
+            delay() {
+                var res = this;
+                if (this.delayForm.enddate == '' || this.delayForm.enddate == undefined) {
+                    this.addserver = '延期结束日期不能为空';
+                    return;
+                }
+                let delayEndTime = new Date(this.delayForm.enddate);
+                if (delayEndTime.getTime() < new Date().getTime()) {
+                    this.addserver = '延期结束日期不能小于当前时间';
+                    return;
+                }
+                console.log(res.delayForm);
+
+            },
             addSure() {
                 this.addnewForm.count = Number(this.addnewForm.count);
                 var res = this;
@@ -551,6 +617,14 @@
     .point-p {
         font-size: 12px;
         color: #f56c82;
+    }
+
+    .span_addserver {
+        display: block;
+        position: relative;
+        left: 100px;
+        color: red;
+        font-size: 12px;
     }
 
     .codeFoot {
