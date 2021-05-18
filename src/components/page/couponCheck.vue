@@ -66,8 +66,8 @@
                 <el-form-item label="开始日期" prop="startdate">
                     <el-date-picker type="datetime" v-model="delayForm.startdate" :disabled="true"></el-date-picker>
                 </el-form-item>
-                <el-form-item label="延期至" prop="enddate">
-                    <el-date-picker type="datetime" v-model="delayForm.enddate"
+                <el-form-item label="延期至" prop="delayDate">
+                    <el-date-picker type="datetime" v-model="delayForm.delayDate"
                                     default-time="23:59:59"></el-date-picker>
                 </el-form-item>
             </el-form>
@@ -174,13 +174,14 @@
                     count: ""
                 },
                 delayForm: {
-                    id:'',
-                    couponId:'',
+                    id: '',
+                    couponId: '',
                     name: '',
                     names: '',
                     remaincount: '',
                     startdate: '',
-                    enddate: ''
+                    enddate: '',
+                    delayDate: ''
                 }
             };
         },
@@ -435,30 +436,56 @@
                 this.addserver = '';
                 console.log(row);
                 this.delayForm = {
-                    id:row.id,
-                    couponId:row.couponid,
+                    id: row.id,
+                    couponId: row.couponid,
                     name: row.name,
                     names: row.names,
                     remaincount: row.remaincount,
                     startdate: row.startdate,
-                    enddate: ""
+                    enddate: row.enddate,
+                    delayDate: ""
                 };
                 this.delayVisible = true;
 
             },
             delay() {
+                this.addserver = '';
                 var res = this;
-                if (this.delayForm.enddate == '' || this.delayForm.enddate == undefined) {
+                if (this.delayForm.delayDate == '' || this.delayForm.delayDate == undefined) {
                     this.addserver = '延期结束日期不能为空';
                     return;
                 }
-                let delayEndTime = new Date(this.delayForm.enddate);
+                let delayEndTime = new Date(this.delayForm.delayDate);
                 if (delayEndTime.getTime() < new Date().getTime()) {
                     this.addserver = '延期结束日期不能小于当前时间';
                     return;
                 }
+                if (delayEndTime.getTime() < new Date(this.delayForm.enddate).getTime()) {
+                    this.addserver = '延期结束日期不能小于生成优惠券结束时间';
+                    return;
+                }
                 console.log(res.delayForm);
-
+                this.$axios({
+                    url: this.GLOBAL._SERVER_API_ + "couponManager/delay",
+                    method: "post",
+                    data: {
+                        id: res.delayForm.id,
+                        couponId: res.delayForm.couponId,
+                        delayEndDate: res.delayForm.delayDate
+                    }
+                })
+                    .then(function (response) {
+                        if (response.data.status === 500) {
+                            res.addserver = response.data.msg;
+                        } else {
+                            res.$message.success("延期成功");
+                            res.delayVisible = false;
+                            res.getData();
+                        }
+                    })
+                    .catch(function (err) {
+                        res.$message.error("延期失败: " + error);
+                    });
             },
             addSure() {
                 this.addnewForm.count = Number(this.addnewForm.count);

@@ -1,7 +1,7 @@
 <template>
     <div class="login-wrap">
         <div class="ms-login">
-            <div class="ms-title">金石停车 商户平台</div>
+            <div class="ms-title">颛华泊车 商户平台</div>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="ms-content">
                 <el-form-item prop="parkName">
                     <el-input v-model="ruleForm.parkName" placeholder="车场名称" @blur="bur">
