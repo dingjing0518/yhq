@@ -51,6 +51,7 @@
                 applyGood: [],
                 verify: false,
                 ruleForm: {
+                    parkName:'',
                     loginName: '',
                     password: ''
                 },
