@@ -64,7 +64,7 @@
 
                 <el-form-item label="开始日期" prop="startdata">
                     <el-date-picker type="datetime" v-model="addForm.startdata"
-                                    placeholder="生效时间，默认无失效日期" ></el-date-picker>
+                                    placeholder="生效时间，默认无失效日期"></el-date-picker>
                 </el-form-item>
                 <el-form-item label="结束日期" prop="enddata">
                     <el-date-picker type="datetime" v-model="addForm.enddata"
@@ -83,7 +83,7 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
         <el-button @click="editVisibleCoupon = false">取 消</el-button>
-        <el-button type="primary" @click="saveEdit">确 定</el-button>
+        <el-button type="primary" @click="saveEdit" :disabled="disableButton">确 定</el-button>
       </span>
         </el-dialog>
     </div>
@@ -162,6 +162,7 @@
                 Alltime: "",
                 AllMoney: "",
                 couponStarttime: "",
+                disableButton: false,
                 addForm: {
                     couponname: "",
                     count: "",
@@ -392,11 +393,6 @@
                 var EndTime = new Date(this.rowtime.endtime);
                 var EndData = new Date(setData.startdata);
                 var StartData = new Date(setData.enddata);
-                console.log(this.rowtime.endtime);
-                console.log(setData.enddata);
-                console.log(EndTime >= EndData);
-                console.log(EndTime);
-                console.log(EndData);
                 if (EndTime >= EndData && StartTime <= StartData) {
                     if (this.names === "减免金额") {
                         console.log(this.remaincount);
@@ -404,6 +400,7 @@
                         if (addservered > Number(this.remaincount)) {
                             this.addserver = "总金额不能大于剩余金额";
                         } else {
+                            this.disableButton = true;
                             this.$axios({
                                 url:
                                     this.GLOBAL._SERVER_API_ + "couponManager/save",
@@ -429,17 +426,17 @@
                                     }
                                 })
                                 .catch(function (error) {
+                                    res.disableButton = false;
                                     res.$message.error("生成优惠券失败！");
                                     console.log(error);
                                 });
                         }
                     } else if (this.names === "减免时长") {
-                        var addservertime = Number(this.addForm.count) * Number(this.addForm.reductiontime);
-                        console.log(addservertime);
-                        console.log(this.remaincount);
+                        let addservertime = Number(this.addForm.count) * Number(this.addForm.reductiontime);
                         if (addservertime > Number(this.remaincount)) {
                             this.addserver = "总时长不能大于剩余时长"
                         } else {
+                            this.disableButton = true;
                             this.$axios({
                                 url:
                                     this.GLOBAL._SERVER_API_ + "couponManager/save",
@@ -451,7 +448,7 @@
                                     if (response.data.status === 200) {
                                         res.editVisibleCoupon = false;
                                         res.$message.success("生成优惠券成功");
-                                        res.addserver = ""
+                                        res.addserver = "";
                                         if (res.tableData[res.idx].id === res.id) {
                                             res.$set(res.tableData, res.idx, res.addForm);
                                         } else {
@@ -466,6 +463,7 @@
                                     }
                                 })
                                 .catch(function (error) {
+                                    res.disableButton = false;
                                     res.$message.error("生成优惠券失败！");
                                     console.log(error);
                                 });
@@ -474,6 +472,7 @@
                         if (Number(this.addForm.count) > Number(this.remaincount)) {
                             this.addserver = "数量不能大于减免券剩余量"
                         } else {
+                            this.disableButton = true;
                             this.$axios({
                                 url:
                                     this.GLOBAL._SERVER_API_ + "couponManager/save",
@@ -485,7 +484,7 @@
                                     if (response.status === 200) {
                                         res.editVisibleCoupon = false;
                                         res.$message.success("生成优惠券成功");
-                                        res.addserver = ""
+                                        res.addserver = "";
                                         console.log("123", response);
                                         if (res.tableData[res.idx].id === res.id) {
                                             res.$set(res.tableData, res.idx, res.addForm);
@@ -501,14 +500,14 @@
                                     }
                                 })
                                 .catch(function (error) {
+                                    res.disableButton = false;
                                     res.$message.error("生成优惠券失败！");
-                                    console.log(error);
                                 });
                         }
                     }
 
                 } else {
-                    res.$message.error("输入的时间在有效时间内")
+                    res.$message.error("输入的时间不在有效时间内")
                 }
 
             },
